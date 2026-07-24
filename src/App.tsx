@@ -2,6 +2,8 @@
 import './App.css'
 import {BrowserRouter, Navigate, Route, Routes} from "react-router";
 import LoginPage from "./pages/LoginPage.tsx";
+import DashboardPage from "./pages/DashboardPage.tsx";
+import {RoomsPage} from "./pages/RoomsPage.tsx";
 
 function App() {
 
@@ -9,7 +11,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path={"login"} element={<LoginPage/>}/>
-      <Route path={"*"} element={<Navigate to="/login" replace />}/>
+        <Route path={"dashboard"} element={<DashboardPage/>}/>
+        <Route path={"rooms"} element={<RoomsPage/>}/>
+        <Route path={"*"} element={<Navigate to="/login" replace />}/>
       </Routes>
 
     </BrowserRouter>
