@@ -1,7 +1,9 @@
 import {useEffect, useState} from 'react'
 import Sidebar from '../components/Sidebar'
 import type { Room, RoomStatus } from '../types/room'
-import {getRooms} from "../api/rooms.ts";
+import { getRoomsByProperty} from "../api/rooms.ts"
+import {useAuthStore} from "../store/authStore.ts";
+
 
 const STATUS_TABS: { label: string; value: RoomStatus | 'All' }[] = [
   { label: 'All', value: 'All' },
@@ -31,6 +33,8 @@ export function RoomsPage() {
   const [loading, setLoading] = useState(false)
   const [activeStatus, setActiveStatus] = useState<RoomStatus | 'All'>('All')
   const [search, setSearch] = useState('')
+  const user = useAuthStore(state=>state.user);
+  
 
   // TODO: fetch rooms on mount and when activeStatus changes
   // use getRooms() or getRoomsByProperty() from src/api/rooms.ts
@@ -43,7 +47,8 @@ export function RoomsPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
-    getRooms().then((data) => setRooms(data.items)).finally(() => setLoading(false))
+    if(user?.propertyId == null) return;
+      getRoomsByProperty(user?.propertyId).then((data) => setRooms(data.items)).finally(() => setLoading(false))
   }, [])
   return (
       <div className="flex min-h-screen bg-[#0F172A]">

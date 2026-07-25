@@ -7,6 +7,7 @@ export interface User {
     email:string,
     tenantId:string
     role:UserRole
+    propertyId?:string
 }
 
 export interface AuthResponse{
