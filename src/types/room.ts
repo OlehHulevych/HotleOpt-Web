@@ -11,6 +11,13 @@ export interface Room {
   tenantId: string
 }
 
+export interface RoomPhoto {
+  id:string
+  url:string
+  roomId:string
+  uploadedById:string
+}
+
 export interface PaginatedResult<T> {
   items: T[]
   totalCount: number

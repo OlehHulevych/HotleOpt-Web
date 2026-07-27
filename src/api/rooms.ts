@@ -1,5 +1,5 @@
 import client from './client'
-import type { Room, PaginatedResult, RoomStatus } from '../types/room'
+import type {Room, PaginatedResult, RoomStatus, RoomPhoto} from '../types/room'
 
 export const getRooms = (page = 1, pageSize = 20) =>
   client
@@ -12,3 +12,4 @@ export const getRoomsByProperty = (propertyId: string, status?: RoomStatus, page
       params: { status, currentPage: page, pageSize },
     })
     .then((r) => r.data.result)
+export const getPhotosByRoom = (roomId:string, page=1, pageSize=20) => client.get<PaginatedResult<RoomPhoto>>(`/api/rooms/${roomId}/photos`, {params:{page,pageSize}}).then(r=>r.data)

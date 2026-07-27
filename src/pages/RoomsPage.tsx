@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react'
+import { useEffect, useState} from 'react'
 import Sidebar from '../components/Sidebar'
-import type { Room, RoomStatus } from '../types/room'
-import { getRoomsByProperty} from "../api/rooms.ts"
+import type {Room, RoomPhoto, RoomStatus} from '../types/room'
+import {getPhotosByRoom, getRoomsByProperty} from "../api/rooms.ts"
 import {useAuthStore} from "../store/authStore.ts";
+
 
 
 const STATUS_TABS: { label: string; value: RoomStatus | 'All' }[] = [
@@ -30,14 +31,18 @@ const TYPE_STYLE: Record<string, string> = {
 
 export function RoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([])
+
+  const [selectedRoom, setSelectedRoom] = useState<Room|null>(null)
   const [loading, setLoading] = useState(false)
   const [activeStatus, setActiveStatus] = useState<RoomStatus | 'All'>('All')
   const [search, setSearch] = useState('')
   const user = useAuthStore(state=>state.user);
-  
+
 
   // TODO: fetch rooms on mount and when activeStatus changes
   // use getRooms() or getRoomsByProperty() from src/api/rooms.ts
+
+
 
   const filtered = rooms.filter((r) => {
     const matchStatus = activeStatus === 'All' || r.status === activeStatus
@@ -50,7 +55,12 @@ export function RoomsPage() {
     if(user?.propertyId == null) return;
       getRoomsByProperty(user?.propertyId).then((data) => setRooms(data.items)).finally(() => setLoading(false))
   }, [])
+
+
+
+
   return (
+      <>
       <div className="flex min-h-screen bg-[#0F172A]">
         <Sidebar/>
 
@@ -125,16 +135,19 @@ export function RoomsPage() {
           ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {filtered.map((room) => (
-                    <RoomCard key={room.id} room={room}/>
+                    <RoomCard setSelectedRoom={setSelectedRoom} key={room.id} room={room} />
                 ))}
               </div>
           )}
         </main>
       </div>
+        <RoomDetailModal room={selectedRoom} onClose={()=>setSelectedRoom(null)}/>
+      </>
   )
+
 }
 
-function RoomCard({ room }: { room: Room }) {
+function RoomCard({ room, setSelectedRoom }: { room: Room, setSelectedRoom:React.Dispatch<React.SetStateAction<Room | null>> }) {
   const status = STATUS_STYLE[room.status]
   const typeStyle = TYPE_STYLE[room.type] ?? 'bg-slate-700 text-slate-300'
 
@@ -158,7 +171,7 @@ function RoomCard({ room }: { room: Room }) {
       </p>
 
       <div className="flex items-center gap-2 pt-4 border-t border-slate-700">
-        <button className="flex-1 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors">
+        <button onClick={():void=>setSelectedRoom(room)} className="flex-1 py-1.5 text-xs font-medium text-slate-300 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-lg transition-colors">
           View Details
         </button>
         <button className="flex-1 py-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 rounded-lg transition-colors">
@@ -166,5 +179,98 @@ function RoomCard({ room }: { room: Room }) {
         </button>
       </div>
     </div>
+  )
+}
+
+function RoomDetailModal({ room, onClose }: { room: Room | null; onClose: () => void }) {
+  const[photos,setPhotos] = useState<RoomPhoto[]>([]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPhotos([])
+    if (room == null) return
+    getPhotosByRoom(room.id, 1, 20).then((data) => setPhotos(data.items))
+  }, [room])
+
+  if (!room) return null
+
+
+  const status = STATUS_STYLE[room.status]
+  const typeStyle = TYPE_STYLE[room.type] ?? 'bg-slate-700 text-slate-300'
+
+
+
+  return (
+      <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={onClose}
+      >
+        <div
+            className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <p className="text-3xl font-bold text-white">#{room.roomNumber}</p>
+              <div className="flex items-center gap-2 mt-2">
+              <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${typeStyle}`}>
+                {room.type}
+              </span>
+                <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${status.badge}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
+                  {room.status}
+              </span>
+              </div>
+            </div>
+            <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors p-1">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Description */}
+          <div className="mb-6">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Description</p>
+            <p className="text-slate-300 text-sm leading-relaxed">
+              {room.description || 'No description provided.'}
+            </p>
+          </div>
+
+          {/* Info grid */}
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <div className="bg-slate-800 rounded-xl p-3">
+              <p className="text-xs text-slate-500 mb-1">Type</p>
+              <p className="text-sm text-white font-medium">{room.type}</p>
+            </div>
+            <div className="bg-slate-800 rounded-xl p-3">
+              <p className="text-xs text-slate-500 mb-1">Status</p>
+              <p className="text-sm text-white font-medium">{room.status}</p>
+            </div>
+          </div>
+          {photos.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Photos</p>
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {photos.map((p) => (
+                      <img
+                          key={p.id}
+                          src={p.url}
+                          className="h-24 w-36 object-cover rounded-lg shrink-0 border border-slate-700"
+                          alt={p.id}/>
+                  ))}
+                </div>
+              </div>
+          )}
+          <button
+              onClick={onClose}
+              className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-colors"
+          >
+            Close
+          </button>
+
+        </div>
+        
+      </div>
   )
 }
