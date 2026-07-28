@@ -1,7 +1,7 @@
-import { useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import Sidebar from '../components/Sidebar'
-import type {Room, RoomPhoto, RoomStatus} from '../types/room'
-import {getPhotosByRoom, getRoomsByProperty} from "../api/rooms.ts"
+import type {Room, RoomPhoto, RoomStatus, RoomType} from '../types/room'
+import {addRoom, getPhotosByRoom, getRoomsByProperty, uploadPhoto} from "../api/rooms.ts"
 import {useAuthStore} from "../store/authStore.ts";
 
 
@@ -31,33 +31,31 @@ const TYPE_STYLE: Record<string, string> = {
 
 export function RoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([])
-
   const [selectedRoom, setSelectedRoom] = useState<Room|null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [activeStatus, setActiveStatus] = useState<RoomStatus | 'All'>('All')
   const [search, setSearch] = useState('')
-  const user = useAuthStore(state=>state.user);
+  const user = useAuthStore(state=>state.user)
+  const isManager = user?.role === 'Manager'
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const fetchRooms = useCallback(() => {
+    if (user?.propertyId == null) return
+    setLoading(true)
+    getRoomsByProperty(user.propertyId).then((data) => setRooms(data.items)).finally(() => setLoading(false))
+  },[user?.propertyId])
 
-  // TODO: fetch rooms on mount and when activeStatus changes
-  // use getRooms() or getRoomsByProperty() from src/api/rooms.ts
-
-
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchRooms()
+  }, [fetchRooms])
 
   const filtered = rooms.filter((r) => {
     const matchStatus = activeStatus === 'All' || r.status === activeStatus
     const matchSearch = r.roomNumber.toLowerCase().includes(search.toLowerCase())
     return matchStatus && matchSearch
   })
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true);
-    if(user?.propertyId == null) return;
-      getRoomsByProperty(user?.propertyId).then((data) => setRooms(data.items)).finally(() => setLoading(false))
-  }, [])
-
-
-
 
   return (
       <>
@@ -72,13 +70,16 @@ export function RoomsPage() {
               <h1 className="text-xl font-semibold text-white">Rooms</h1>
               <p className="text-slate-400 text-sm mt-0.5">{rooms.length} total</p>
             </div>
-            <button
+            {isManager && (
+              <button
+                onClick={() => setShowAddModal(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-white text-sm font-medium rounded-lg transition-colors">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
-              </svg>
-              Add Room
-            </button>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+                </svg>
+                Add Room
+              </button>
+            )}
           </div>
 
           {/* Filters */}
@@ -111,7 +112,7 @@ export function RoomsPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search room number..."
-                  className="pl-9 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  className="pl-9 pr-4 py-2 bg-slate-800/50 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
               />
             </div>
           </div>
@@ -141,10 +142,18 @@ export function RoomsPage() {
           )}
         </main>
       </div>
-        <RoomDetailModal room={selectedRoom} onClose={()=>setSelectedRoom(null)}/>
+
+      <RoomDetailModal room={selectedRoom} onClose={() => setSelectedRoom(null)} />
+      {isManager && user?.propertyId && (
+        <AddRoomModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSuccess={fetchRooms}
+          propertyId={user.propertyId}
+        />
+      )}
       </>
   )
-
 }
 
 function RoomCard({ room, setSelectedRoom }: { room: Room, setSelectedRoom:React.Dispatch<React.SetStateAction<Room | null>> }) {
@@ -166,7 +175,7 @@ function RoomCard({ room, setSelectedRoom }: { room: Room, setSelectedRoom:React
         </span>
       </div>
 
-      <p className="text-slate-400 text-sm line-clamp-2 mb-4 min-h-[2.5rem]">
+      <p className="text-slate-400 text-sm line-clamp-2 mb-4 min-h-10">
         {room.description || 'No description'}
       </p>
 
@@ -190,14 +199,17 @@ function RoomDetailModal({ room, onClose }: { room: Room | null; onClose: () => 
     if (room == null) return
     getPhotosByRoom(room.id, 1, 20).then((data) => setPhotos(data.items))
   }, [room])
+  const uploadPhotosHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0 || room == null) return
+    await Promise.all(files.map((file) => uploadPhoto(room.id, file)))
+    getPhotosByRoom(room.id, 1, 20).then((data) => setPhotos(data.items))
+  }
 
   if (!room) return null
 
-
   const status = STATUS_STYLE[room.status]
   const typeStyle = TYPE_STYLE[room.type] ?? 'bg-slate-700 text-slate-300'
-
-
 
   return (
       <div
@@ -248,6 +260,7 @@ function RoomDetailModal({ room, onClose }: { room: Room | null; onClose: () => 
               <p className="text-sm text-white font-medium">{room.status}</p>
             </div>
           </div>
+
           {photos.length > 0 && (
               <div className="mb-6">
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Photos</p>
@@ -262,15 +275,152 @@ function RoomDetailModal({ room, onClose }: { room: Room | null; onClose: () => 
                 </div>
               </div>
           )}
+          <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={uploadPhotosHandler}
+              className="hidden"
+              id="photo-upload"
+          />
+          <label
+              htmlFor="photo-upload"
+              className="w-full py-2.5 mb-2 text-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-colors cursor-pointer block"
+          >
+            Upload Photos
+          </label>
+
           <button
               onClick={onClose}
               className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-colors"
           >
             Close
           </button>
-
         </div>
-        
       </div>
+  )
+}
+
+function AddRoomModal({ isOpen, onClose, onSuccess, propertyId }: {
+  isOpen: boolean
+  onClose: () => void
+  onSuccess: () => void
+  propertyId: string
+}) {
+  const [roomNumber, setRoomNumber] = useState('')
+  const [description, setDescription] = useState('')
+  const [type, setType] = useState<RoomType>('Single')
+  const [pricePerNight, setPricePerNight] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  if (!isOpen) return null
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    try {
+      await addRoom({ roomNumber, description, propertyId, type, pricePerNight: Number(pricePerNight) })
+      onSuccess()
+      onClose()
+    } catch {
+      setError('Failed to create room. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md mx-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-white">Add Room</h2>
+          <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors p-1">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Room Number</label>
+            <input
+              required
+              value={roomNumber}
+              onChange={(e) => setRoomNumber(e.target.value)}
+              placeholder="e.g. 101"
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Type</label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value as RoomType)}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            >
+              {(['Single', 'Double', 'Twin', 'Suite', 'Deluxe'] as RoomType[]).map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Price per Night (€)</label>
+            <input
+              required
+              type="number"
+              min="0"
+              step="0.01"
+              value={pricePerNight}
+              onChange={(e) => setPricePerNight(e.target.value)}
+              placeholder="e.g. 120.00"
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-slate-400 mb-1.5">Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Room description..."
+              rows={3}
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 resize-none"
+            />
+          </div>
+
+          {error && <p className="text-rose-400 text-xs">{error}</p>}
+
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 py-2.5 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors"
+            >
+              {loading ? 'Creating...' : 'Create Room'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )
 }
