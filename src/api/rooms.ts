@@ -27,3 +27,6 @@ export const uploadPhoto = async (roomId:string, file:File) =>{
     form.append('file', compressedFile)
     return client.post(`/api/rooms/${roomId}/photos`, form);
 }
+export const updateRoom = (dto:{id:string, roomNumber?:string, description?:string, propertyId?:string, type:RoomType, pricePerNight?:number}) => {
+    client.put('/api/room', dto);
+}
