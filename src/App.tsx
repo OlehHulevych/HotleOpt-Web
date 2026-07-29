@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage.tsx";
 import DashboardPage from "./pages/DashboardPage.tsx";
 import {RoomsPage} from "./pages/RoomsPage.tsx";
 import BookingsPage from "./pages/BookingsPage.tsx";
+import {GuestsPage} from "./pages/GuestsPage.tsx";
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
         <Route path={"login"} element={<LoginPage/>}/>
         <Route path={"dashboard"} element={<DashboardPage/>}/>
         <Route path={"rooms"} element={<RoomsPage/>}/>
+        <Route path={"guests"} element={<GuestsPage/>}/>
         <Route path={"bookings"} element={<BookingsPage/>}/>
         <Route path={"*"} element={<Navigate to="/login" replace />}/>
       </Routes>
