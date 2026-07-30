@@ -3,6 +3,7 @@ export type BookingStatus = 'Confirmed' | 'CheckedIn' | 'CheckedOut' | 'Cancelle
 export interface Booking {
   id: string
   roomId: string
+  roomNumber:string,
   propertyId: string
   checkInDate: string
   checkOutDate: string

@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar'
 import type { Booking, BookingStatus } from '../types/booking'
 import { getBookingsByProperty, checkIn, checkOut, cancelBooking } from '../api/bookings'
 import { useAuthStore } from '../store/authStore'
+import {AddBookingModal} from "./bookings/AddBookingModal.tsx";
 
 
 const STATUS_TABS: { label: string; value: BookingStatus | 'All' }[] = [
@@ -40,7 +41,7 @@ export default function BookingsPage() {
   const user = useAuthStore((s) => s.user)
   const isManager = user?.role === 'Manager'
   const propertyId = user?.propertyId;
-
+  const [showAddModal, setShowAddModal] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(false)
   const [activeStatus, setActiveStatus] = useState<BookingStatus | 'All'>('All')
@@ -82,6 +83,7 @@ export default function BookingsPage() {
   }
 
   return (
+      <>
     <div className="flex min-h-screen bg-[#0F172A]">
       <Sidebar />
 
@@ -95,12 +97,12 @@ export default function BookingsPage() {
           </div>
           <div className="flex items-center gap-3">
 
-          <button className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-white text-sm font-medium rounded-lg transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Booking
-          </button>
+              {isManager && (<button onClick={()=>setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-white text-sm font-medium rounded-lg transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Booking
+          </button>)}
           </div>
         </div>
 
@@ -157,7 +159,7 @@ export default function BookingsPage() {
                       <div className="text-white font-medium">
                         {b.guestNames.length > 0 ? b.guestNames.join(', ') : '—'}
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5 font-mono">{b.roomId.slice(0, 8)}…</div>
+                      <div className="text-xs text-slate-500 mt-0.5 font-mono">{b.roomNumber}</div>
                     </td>
                     <td className="px-5 py-4 text-slate-300">{fmt(b.checkInDate)}</td>
                     <td className="px-5 py-4 text-slate-300">{fmt(b.checkOutDate)}</td>
@@ -206,5 +208,7 @@ export default function BookingsPage() {
         </div>
       </main>
     </div>
+          <AddBookingModal isOpen={showAddModal} propertyId={propertyId!} onClose={()=>setShowAddModal(false)} onSuccess={fetchBookings}/>
+      </>
   )
 }

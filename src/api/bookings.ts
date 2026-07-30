@@ -17,3 +17,7 @@ export const checkOut = (id: string) =>
 
 export const cancelBooking = (id: string) =>
   client.post(`/api/bookings/${id}/cancel`)
+
+
+export const createBooking = (dto:{roomId:string, propertyId:string,primaryGuestId:string,checkInDate:string, checkOutDate:string}) => client.post("/api/bookings", dto).then(r=>r.data);
+export const addGuestToBooking = (bookingId:string,guestId:string)=> client.post(`/api/bookings/${bookingId}/guests/${guestId}`).then(r=>r.data);
