@@ -8,6 +8,7 @@ export interface HousekeepingTask  {
     assignedById:string,
     assignedByName:string,
     roomId:string,
+    roomNumber:string,
     status:TaskStatus,
     scheduledAt:string,
     competedAt:string

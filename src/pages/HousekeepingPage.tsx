@@ -147,7 +147,7 @@ export function HousekeepingPage() {
                       <tr key={t.id} className="border-b border-slate-700/50 hover:bg-slate-700/20 transition-colors">
                         <td className="px-5 py-4">
                           <p className="text-white font-medium">{t.title}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">Room {t.roomId.slice(0, 8)}…</p>
+                          <p className="text-xs text-slate-500 mt-0.5">Room {t.roomNumber}</p>
                         </td>
                         <td className="px-5 py-4 text-slate-300">{t.assignedToName ?? '—'}</td>
                         <td className="px-5 py-4 text-slate-300">{fmt(t.scheduledAt)}</td>
