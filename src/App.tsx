@@ -7,6 +7,7 @@ import {RoomsPage} from "./pages/RoomsPage.tsx";
 import BookingsPage from "./pages/BookingsPage.tsx";
 import {GuestsPage} from "./pages/GuestsPage.tsx";
 import {HousekeepingPage} from "./pages/HousekeepingPage.tsx";
+import {MaintenancePage} from "./pages/MaintenancePage.tsx";
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
         <Route path={"guests"} element={<GuestsPage/>}/>
         <Route path={"bookings"} element={<BookingsPage/>}/>
         <Route path={"*"} element={<Navigate to="/login" replace />}/>
+        <Route path = {"/maintenance"} element={<MaintenancePage/>}/>
       </Routes>
 
     </BrowserRouter>
