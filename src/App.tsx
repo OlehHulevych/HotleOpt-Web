@@ -12,6 +12,7 @@ import {useEffect} from "react";
 import {getMe} from "./api/auth.ts";
 import {useAuthStore} from "./store/authStore.ts";
 import {ShiftsPage} from "./pages/ShiftsPage.tsx";
+import {ProfilePage} from "./pages/ProfilePage.tsx";
 
 function App() {
   const setUser = useAuthStore((s)=>s.setUser);
@@ -36,6 +37,7 @@ function App() {
         <Route path={"shifts"} element={<ShiftsPage/>}/>
         <Route path={"*"} element={<Navigate to="/login" replace />}/>
         <Route path = {"/maintenance"} element={<MaintenancePage/>}/>
+        <Route path = {"profile"} element={<ProfilePage/>}/>
       </Routes>
 
     </BrowserRouter>

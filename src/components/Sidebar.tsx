@@ -51,6 +51,14 @@ const navItems = [
     ),
   },
   {
+    to: '/profile',
+    label: 'Profile',
+    icon: (
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    ),
+  },
+  {
     to: '/guests',
     label: 'Guests',
     icon: (
@@ -108,9 +116,13 @@ export default function Sidebar() {
       {/* User */}
       <div className="border-t border-slate-800 px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-300 font-medium shrink-0">
-            {user?.firstName?.[0]}{user?.secondName?.[0]}
-          </div>
+          {user?.avatarUrl ? (
+            <img src={user.avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full object-cover shrink-0" />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-300 font-medium shrink-0">
+              {user?.firstName?.[0]}{user?.secondName?.[0]}
+            </div>
+          )}
           <div className="flex-1 min-w-0">
             <p className="text-sm text-white truncate">{user?.firstName} {user?.secondName}</p>
             <p className="text-xs text-slate-500 truncate">{user?.role}</p>
