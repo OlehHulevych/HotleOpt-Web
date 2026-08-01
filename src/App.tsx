@@ -11,6 +11,7 @@ import {MaintenancePage} from "./pages/MaintenancePage.tsx";
 import {useEffect} from "react";
 import {getMe} from "./api/auth.ts";
 import {useAuthStore} from "./store/authStore.ts";
+import {ShiftsPage} from "./pages/ShiftsPage.tsx";
 
 function App() {
   const setUser = useAuthStore((s)=>s.setUser);
@@ -22,7 +23,7 @@ function App() {
       setUser(user);
     }
     fetch();
-  }, []);
+  }, [setUser]);
   return (
     <BrowserRouter>
       <Routes>
@@ -32,6 +33,7 @@ function App() {
         <Route path = {"tasks"} element={<HousekeepingPage/>}/>
         <Route path={"guests"} element={<GuestsPage/>}/>
         <Route path={"bookings"} element={<BookingsPage/>}/>
+        <Route path={"shifts"} element={<ShiftsPage/>}/>
         <Route path={"*"} element={<Navigate to="/login" replace />}/>
         <Route path = {"/maintenance"} element={<MaintenancePage/>}/>
       </Routes>
