@@ -7,7 +7,8 @@ export type AuthStore = {
     user:User |null;
     refreshToken:string;
     login:(token:string, user:User, refreshToken:string)=>void,
-    logout:()=>void
+    logout:()=>void,
+    setUser:(user:User)=>void;
 }
 
 export const useAuthStore = create<AuthStore>((set)=>({
@@ -24,5 +25,6 @@ export const useAuthStore = create<AuthStore>((set)=>({
         localStorage.removeItem('token')
         localStorage.removeItem('refreshToken')
         set({token:'', refreshToken:'',user:null})
-    }
+    },
+    setUser:(user:User) => set({user})
 }))

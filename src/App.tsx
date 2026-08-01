@@ -8,9 +8,21 @@ import BookingsPage from "./pages/BookingsPage.tsx";
 import {GuestsPage} from "./pages/GuestsPage.tsx";
 import {HousekeepingPage} from "./pages/HousekeepingPage.tsx";
 import {MaintenancePage} from "./pages/MaintenancePage.tsx";
+import {useEffect} from "react";
+import {getMe} from "./api/auth.ts";
+import {useAuthStore} from "./store/authStore.ts";
 
 function App() {
-
+  const setUser = useAuthStore((s)=>s.setUser);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if(!token) return;
+    const fetch = async () => {
+      const user = await getMe()
+      setUser(user);
+    }
+    fetch();
+  }, []);
   return (
     <BrowserRouter>
       <Routes>
