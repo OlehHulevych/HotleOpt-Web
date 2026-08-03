@@ -4,6 +4,7 @@ import type { Shift, ShiftStatus } from '../types/shift'
 import { getShiftsByProperty, deleteShift } from '../api/shifts'
 import { useAuthStore } from '../store/authStore'
 import { AddShiftModal } from './shifts/AddShiftModal'
+import { Pagination } from '../components/Pagination'
 
 const STATUS_TABS: { label: string; value: ShiftStatus | 'All' }[] = [
   { label: 'All', value: 'All' },
@@ -42,19 +43,22 @@ export function ShiftsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   const fetchShifts = useCallback(() => {
     if (!propertyId) return
     setLoading(true)
-    getShiftsByProperty(propertyId)
+    getShiftsByProperty(propertyId, page)
       .then((data) => {
         const filtered = activeStatus === 'All'
           ? data.items
           : data.items.filter((s) => s.status === activeStatus)
         setShifts(filtered)
+        setTotalPages(data.totalPages)
       })
       .finally(() => setLoading(false))
-  }, [propertyId, activeStatus])
+  }, [propertyId, activeStatus, page])
 
   useEffect(() => {
     fetchShifts()
@@ -96,7 +100,7 @@ export function ShiftsPage() {
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setActiveStatus(tab.value)}
+                onClick={() => { setActiveStatus(tab.value); setPage(1) }}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
@@ -163,6 +167,7 @@ export function ShiftsPage() {
                 )}
               </tbody>
             </table>
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
         </main>
       </div>

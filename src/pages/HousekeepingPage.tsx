@@ -4,6 +4,7 @@ import type { HousekeepingTask, TaskStatus } from '../types/task'
 import { getTasksByProperty, startTask, completeTask, cancelTask } from '../api/task'
 import { useAuthStore } from '../store/authStore'
 import { AddTaskModal } from './housekeeping/AddTaskModal'
+import { Pagination } from '../components/Pagination'
 
 const STATUS_TABS: { label: string; value: TaskStatus | 'All' }[] = [
   { label: 'All', value: 'All' },
@@ -41,15 +42,17 @@ export function HousekeepingPage() {
   const [activeStatus, setActiveStatus] = useState<TaskStatus | 'All'>('All')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   const fetchTasks = useCallback(() => {
     if (!propertyId) return
     setLoading(true)
     const filters = activeStatus !== 'All' ? { Status: activeStatus as TaskStatus } : undefined
-    getTasksByProperty(propertyId, filters)
-      .then((data) => setTasks(data.items))
+    getTasksByProperty(propertyId, filters, page)
+      .then((data) => { setTasks(data.items); setTotalPages(data.totalPages) })
       .finally(() => setLoading(false))
-  }, [propertyId, activeStatus])
+  }, [propertyId, activeStatus, page])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -105,7 +108,7 @@ export function HousekeepingPage() {
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setActiveStatus(tab.value)}
+                onClick={() => { setActiveStatus(tab.value); setPage(1) }}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
@@ -194,6 +197,7 @@ export function HousekeepingPage() {
                 )}
               </tbody>
             </table>
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
         </main>
       </div>

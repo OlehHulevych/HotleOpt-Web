@@ -4,6 +4,7 @@ import type { MaintenanceTicket, TicketStatus, TicketPriority } from '../types/t
 import { getTicketsByProperty, resolveTicket, closeTicket, deleteTicket } from '../api/tickets'
 import { useAuthStore } from '../store/authStore'
 import { AddTicketModal } from './maintenance/AddTicketModal'
+import { Pagination } from '../components/Pagination'
 
 const STATUS_TABS: { label: string; value: TicketStatus | 'All' }[] = [
   { label: 'All', value: 'All' },
@@ -45,15 +46,17 @@ export function MaintenancePage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   const fetchTickets = useCallback(() => {
     if (!propertyId) return
     setLoading(true)
     const filters = activeStatus !== 'All' ? { Status: activeStatus as TicketStatus } : {}
-    getTicketsByProperty(propertyId, filters)
-      .then((data) => setTickets(data.items))
+    getTicketsByProperty(propertyId, filters, page)
+      .then((data) => { setTickets(data.items); setTotalPages(data.totalPages) })
       .finally(() => setLoading(false))
-  }, [propertyId, activeStatus])
+  }, [propertyId, activeStatus, page])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -110,7 +113,7 @@ export function MaintenancePage() {
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setActiveStatus(tab.value)}
+                onClick={() => { setActiveStatus(tab.value); setPage(1) }}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
@@ -200,6 +203,7 @@ export function MaintenancePage() {
                 )}
               </tbody>
             </table>
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
         </main>
       </div>

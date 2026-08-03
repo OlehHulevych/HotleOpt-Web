@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState, type SetStateAction} from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import type {Guest} from '../types/guest'
 import {getGuests, deleteGuest} from '../api/guests'
 import {useAuthStore} from '../store/authStore'
 import {AddGuestModal} from './guests/AddGuestModal'
 import {EditGuestModal} from './guests/EditGuestModal'
+import { Pagination } from '../components/Pagination'
 
 export function GuestsPage() {
   const [guests, setGuests] = useState<Guest[]>([])
@@ -12,15 +13,17 @@ export function GuestsPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const user = useAuthStore((state) => state.user)
   const isManager = user?.role === 'Manager'
 
   const fetchGuests = useCallback(() => {
     setLoading(true)
-    getGuests()
-        .then((data: { items: SetStateAction<Guest[]> }) => setGuests(data.items))
+    getGuests(page)
+      .then((data) => { setGuests(data.items); setTotalPages(data.totalPages) })
       .finally(() => setLoading(false))
-  }, [])
+  }, [page])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -136,6 +139,7 @@ export function GuestsPage() {
                   ))}
                 </tbody>
               </table>
+              <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
             </div>
           )}
         </main>

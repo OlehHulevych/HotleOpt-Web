@@ -4,6 +4,7 @@ import type { Booking, BookingStatus } from '../types/booking'
 import { getBookingsByProperty, checkIn, checkOut, cancelBooking } from '../api/bookings'
 import { useAuthStore } from '../store/authStore'
 import {AddBookingModal} from "./bookings/AddBookingModal.tsx";
+import { Pagination } from '../components/Pagination'
 
 
 const STATUS_TABS: { label: string; value: BookingStatus | 'All' }[] = [
@@ -46,15 +47,17 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(false)
   const [activeStatus, setActiveStatus] = useState<BookingStatus | 'All'>('All')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   const fetchBookings = useCallback(() => {
     if (!propertyId) return
     setLoading(true)
     const filters = activeStatus !== 'All' ? { status: activeStatus } : undefined
-    getBookingsByProperty(propertyId, filters)
-      .then((result) => setBookings(result.items))
+    getBookingsByProperty(propertyId, filters, page)
+      .then((result) => { setBookings(result.items); setTotalPages(result.totalPages) })
       .finally(() => setLoading(false))
-  },[activeStatus, propertyId])
+  },[activeStatus, propertyId, page])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -62,24 +65,42 @@ export default function BookingsPage() {
   }, [fetchBookings])
 
   const handleCheckIn = async (id: string) => {
-    setActionLoading(id)
-    await checkIn(id)
-    fetchBookings()
-    setActionLoading(null)
+    try{
+      setActionLoading(id)
+      await checkIn(id)
+      fetchBookings()
+      setActionLoading(null)
+    }
+    catch(error){
+      console.error("Check in error: "+error)
+    }
+
   }
 
   const handleCheckOut = async (id: string) => {
-    setActionLoading(id)
-    await checkOut(id)
-    fetchBookings()
-    setActionLoading(null)
+    try{
+      setActionLoading(id)
+      await checkOut(id)
+      fetchBookings()
+      setActionLoading(null)
+    }
+    catch (error){
+      console.error("Check out error: "+error)
+    }
+
   }
 
   const handleCancel = async (id: string) => {
-    setActionLoading(id)
-    await cancelBooking(id)
-    fetchBookings()
-    setActionLoading(null)
+    try {
+      setActionLoading(id)
+      await cancelBooking(id)
+      fetchBookings()
+      setActionLoading(null)
+    }
+    catch (error){
+      console.error("Cancel error: "+error);
+    }
+
   }
 
   return (
@@ -111,7 +132,7 @@ export default function BookingsPage() {
           {STATUS_TABS.map((tab) => (
             <button
               key={tab.value}
-              onClick={() => setActiveStatus(tab.value)}
+              onClick={() => { setActiveStatus(tab.value); setPage(1) }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 activeStatus === tab.value
                   ? 'bg-slate-700 text-white'
@@ -205,6 +226,7 @@ export default function BookingsPage() {
               )}
             </tbody>
           </table>
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </div>
       </main>
     </div>
