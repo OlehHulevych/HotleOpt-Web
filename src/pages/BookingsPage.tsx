@@ -4,6 +4,7 @@ import type { Booking, BookingFilters, BookingStatus } from '../types/booking'
 import { getBookingsByProperty, checkIn, checkOut, cancelBooking } from '../api/bookings'
 import { useAuthStore } from '../store/authStore'
 import { AddBookingModal } from './bookings/AddBookingModal.tsx'
+import { InvoiceModal } from './bookings/InvoiceModal.tsx'
 import { Pagination } from '../components/Pagination'
 import { toast } from 'sonner'
 
@@ -59,6 +60,7 @@ export default function BookingsPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [filters, setFilters] = useState<BookingFilters>(EMPTY_FILTERS)
+  const [invoiceBookingId, setInvoiceBookingId] = useState<string | null>(null)
 
   const hasActiveFilters = !!(filters.checkInFrom || filters.checkInTo || filters.sortBy)
 
@@ -300,6 +302,14 @@ export default function BookingsPage() {
                               Check Out
                             </button>
                           )}
+                          {b.status === 'CheckedOut' && (
+                            <button
+                              onClick={() => setInvoiceBookingId(b.id)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                            >
+                              Invoice
+                            </button>
+                          )}
                           {isManager && (b.status === 'Confirmed' || b.status === 'CheckedIn') && (
                             <button
                               onClick={() => handleCancel(b.id)}
@@ -326,6 +336,12 @@ export default function BookingsPage() {
         propertyId={propertyId!}
         onClose={() => setShowAddModal(false)}
         onSuccess={fetchBookings}
+      />
+
+      <InvoiceModal
+        bookingId={invoiceBookingId ?? ''}
+        isOpen={invoiceBookingId !== null}
+        onClose={() => setInvoiceBookingId(null)}
       />
     </>
   )
