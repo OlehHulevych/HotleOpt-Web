@@ -8,6 +8,7 @@ import { RoomCard } from './rooms/RoomCard'
 import { RoomDetailModal } from './rooms/RoomDetailModal'
 import { AddRoomModal } from './rooms/AddRoomModal'
 import { EditRoomModal } from './rooms/EditRoomModal'
+import {Pagination} from "../components/Pagination.tsx";
 
 export function RoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([])
@@ -19,15 +20,20 @@ export function RoomsPage() {
   const [search, setSearch] = useState('')
   const user = useAuthStore((state) => state.user)
   const isManager = user?.role === 'Manager'
+  const [page,setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1);
 
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const fetchRooms = useCallback(() => {
     if (user?.propertyId == null) return
     setLoading(true)
-    getRoomsByProperty(user.propertyId)
-      .then((data) => setRooms(data.items))
+    getRoomsByProperty(user.propertyId,undefined,page)
+      .then((data) => {
+        setRooms(data.items)
+        setTotalPages(data.totalPages)
+      })
       .finally(() => setLoading(false))
-  }, [user?.propertyId])
+  }, [user?.propertyId,page])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -118,6 +124,7 @@ export function RoomsPage() {
               ))}
             </div>
           )}
+          <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </main>
       </div>
 
