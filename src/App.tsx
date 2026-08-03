@@ -14,6 +14,7 @@ import {useAuthStore} from "./store/authStore.ts";
 import {ShiftsPage} from "./pages/ShiftsPage.tsx";
 import {ProfilePage} from "./pages/ProfilePage.tsx";
 import {ChatPage} from "./pages/ChatPage.tsx";
+import {Toaster} from "sonner";
 
 function App() {
   const setUser = useAuthStore((s)=>s.setUser);
@@ -28,6 +29,7 @@ function App() {
   }, [setUser]);
   return (
     <BrowserRouter>
+        <Toaster position={"top-right"} richColors/>
       <Routes>
         <Route path={"login"} element={<LoginPage/>}/>
         <Route path={"dashboard"} element={<DashboardPage/>}/>

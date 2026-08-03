@@ -5,6 +5,8 @@ import { getBookingsByProperty, checkIn, checkOut, cancelBooking } from '../api/
 import { useAuthStore } from '../store/authStore'
 import {AddBookingModal} from "./bookings/AddBookingModal.tsx";
 import { Pagination } from '../components/Pagination'
+import {toast} from "sonner";
+
 
 
 const STATUS_TABS: { label: string; value: BookingStatus | 'All' }[] = [
@@ -71,8 +73,9 @@ export default function BookingsPage() {
       fetchBookings()
       setActionLoading(null)
     }
-    catch(error){
-      console.error("Check in error: "+error)
+
+    catch(error:any){
+      toast.error(error?.response?.data?.message ?? "Check-in failed")
     }
 
   }
@@ -84,8 +87,8 @@ export default function BookingsPage() {
       fetchBookings()
       setActionLoading(null)
     }
-    catch (error){
-      console.error("Check out error: "+error)
+    catch (error:any){
+      toast.error(error?.response?.data?.message ?? "Check-out failed")
     }
 
   }
@@ -97,8 +100,8 @@ export default function BookingsPage() {
       fetchBookings()
       setActionLoading(null)
     }
-    catch (error){
-      console.error("Cancel error: "+error);
+    catch (error:any){
+      toast.error(error?.response?.data?.message ?? "Cancel failed");
     }
 
   }
