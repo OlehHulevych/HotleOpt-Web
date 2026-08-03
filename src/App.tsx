@@ -14,6 +14,7 @@ import {useAuthStore} from "./store/authStore.ts";
 import {ShiftsPage} from "./pages/ShiftsPage.tsx";
 import {ProfilePage} from "./pages/ProfilePage.tsx";
 import {ChatPage} from "./pages/ChatPage.tsx";
+import {FairnessPage} from "./pages/FairnessPage.tsx";
 import {Toaster} from "sonner";
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
         <Route path = {"/maintenance"} element={<MaintenancePage/>}/>
         <Route path = {"profile"} element={<ProfilePage/>}/>
         <Route path={"chat"} element={<ChatPage/>}/>
+        <Route path={"fairness"} element={<FairnessPage/>}/>
       </Routes>
 
     </BrowserRouter>
