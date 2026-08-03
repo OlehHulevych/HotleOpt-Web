@@ -2,9 +2,7 @@ import type {HousekeepingTask, HouseTaskFilters} from "../types/task.ts";
 import client from "./client.ts";
 import type {PaginatedResult} from "../types/room.ts";
 
-export const getTasksByProperty = (propertyId: string, filters?: {
-    Status: "Pending" | "InProgress" | "Completed" | "Cancelled"
-} | undefined, page = 1, pageSize = 20) => {
+export const getTasksByProperty = (propertyId: string, filters?: HouseTaskFilters, page = 1, pageSize = 20) => {
     return client.get<{ list: PaginatedResult<HousekeepingTask> }>(`/api/task/property/${propertyId}`, {params:{...filters, currentPage:page,pageSize}}).then((r)=>r.data.list)
 
 }

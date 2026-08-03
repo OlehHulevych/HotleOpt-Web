@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
-import type { MaintenanceTicket, TicketStatus, TicketPriority } from '../types/ticket'
+import type { MaintenanceTicket, TicketFilters, TicketStatus, TicketPriority } from '../types/ticket'
 import { getTicketsByProperty, resolveTicket, closeTicket, deleteTicket } from '../api/tickets'
 import { useAuthStore } from '../store/authStore'
 import { AddTicketModal } from './maintenance/AddTicketModal'
@@ -35,6 +35,23 @@ const PRIORITY_STYLE: Record<TicketPriority, string> = {
   Critical: 'bg-rose-500/10 text-rose-400',
 }
 
+const PRIORITY_ACTIVE: Record<TicketPriority, string> = {
+  Low:      'bg-slate-500/30 text-slate-200 border-slate-400',
+  Medium:   'bg-amber-500/30 text-amber-200 border-amber-400',
+  High:     'bg-orange-500/30 text-orange-200 border-orange-400',
+  Critical: 'bg-rose-500/30 text-rose-200 border-rose-400',
+}
+
+const PRIORITIES: TicketPriority[] = ['Low', 'Medium', 'High', 'Critical']
+
+const SORT_OPTIONS = [
+  { label: 'Created date', value: 'createdAt' },
+  { label: 'Priority',     value: 'priority' },
+  { label: 'Status',       value: 'status' },
+]
+
+const EMPTY_FILTERS: TicketFilters = {}
+
 export function MaintenancePage() {
   const user = useAuthStore((s) => s.user)
   const isManager = user?.role === 'Manager'
@@ -48,20 +65,24 @@ export function MaintenancePage() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [filters, setFilters] = useState<TicketFilters>(EMPTY_FILTERS)
+
+  const hasActiveFilters = !!(filters.Priority || filters.CreatedFrom || filters.CreatedTo || filters.SortBy)
 
   const fetchTickets = useCallback(() => {
     if (!propertyId) return
     setLoading(true)
-    const filters = activeStatus !== 'All' ? { Status: activeStatus as TicketStatus } : {}
-    getTicketsByProperty(propertyId, filters, page)
+    const apiFilters: TicketFilters = {
+      ...filters,
+      ...(activeStatus !== 'All' ? { Status: activeStatus as TicketStatus } : {}),
+    }
+    getTicketsByProperty(propertyId, apiFilters, page)
       .then((data) => { setTickets(data.items); setTotalPages(data.totalPages) })
       .finally(() => setLoading(false))
-  }, [propertyId, activeStatus, page])
+  }, [propertyId, activeStatus, page, filters])
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchTickets()
-  }, [fetchTickets])
+  useEffect(() => { fetchTickets() }, [fetchTickets])
+  useEffect(() => { setPage(1) }, [filters, activeStatus])
 
   const handleResolve = async (id: string) => {
     setActionLoading(id)
@@ -91,6 +112,7 @@ export function MaintenancePage() {
         <Sidebar />
 
         <main className="flex-1 p-8 overflow-y-auto">
+          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">Maintenance</h1>
@@ -109,11 +131,12 @@ export function MaintenancePage() {
             )}
           </div>
 
-          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-6">
+          {/* Status tabs */}
+          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-4">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => { setActiveStatus(tab.value); setPage(1) }}
+                onClick={() => setActiveStatus(tab.value)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
@@ -123,6 +146,110 @@ export function MaintenancePage() {
             ))}
           </div>
 
+          {/* Filter bar */}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            {/* Priority toggle buttons */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 font-medium">Priority</label>
+              <div className="flex gap-1">
+                {PRIORITIES.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setFilters((f) => ({ ...f, Priority: f.Priority === p ? undefined : p }))}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                      filters.Priority === p
+                        ? PRIORITY_ACTIVE[p]
+                        : `${PRIORITY_STYLE[p]} border-transparent hover:border-current`
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Created from */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 font-medium">From</label>
+              <input
+                type="date"
+                value={filters.CreatedFrom ?? ''}
+                onChange={(e) => setFilters((f) => ({ ...f, CreatedFrom: e.target.value || undefined }))}
+                className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 [color-scheme:dark]"
+              />
+            </div>
+
+            {/* Created to */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 font-medium">To</label>
+              <input
+                type="date"
+                value={filters.CreatedTo ?? ''}
+                onChange={(e) => setFilters((f) => ({ ...f, CreatedTo: e.target.value || undefined }))}
+                className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 [color-scheme:dark]"
+              />
+            </div>
+
+            {/* Sort by */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 font-medium">Sort by</label>
+              <select
+                value={filters.SortBy ?? ''}
+                onChange={(e) => setFilters((f) => ({ ...f, SortBy: e.target.value || undefined }))}
+                className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              >
+                <option value="">Default</option>
+                {SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Asc / Desc toggle */}
+            {filters.SortBy && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-slate-500 font-medium">Order</label>
+                <button
+                  onClick={() => setFilters((f) => ({ ...f, SortDescending: !f.SortDescending }))}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white hover:bg-slate-700 transition-colors"
+                >
+                  {filters.SortDescending ? (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                      </svg>
+                      Desc
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                      </svg>
+                      Asc
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Clear */}
+            {hasActiveFilters && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-slate-500 font-medium opacity-0">Clear</label>
+                <button
+                  onClick={() => setFilters(EMPTY_FILTERS)}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-sm text-rose-400 hover:bg-rose-500/20 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Table */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>

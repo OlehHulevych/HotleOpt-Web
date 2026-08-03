@@ -44,7 +44,7 @@ export default function DashboardPage() {
     Promise.all([
       getRoomsByProperty(propertyId, undefined, 1, 100),
       getBookingsByProperty(propertyId, { Status: 'CheckedIn' }, 1, 1),
-      getTasksByProperty(propertyId, { Status: 'Pending' }, 1, 1),
+      getTasksByProperty(propertyId, {Status: 'Pending'}, 1, 1),
       getTicketsByProperty(propertyId, { Status: 'Open' }, 1, 1),
     ]).then(([rooms, bookings, tasks, tickets]) => {
       const statusCounts: Record<string, number> = {}

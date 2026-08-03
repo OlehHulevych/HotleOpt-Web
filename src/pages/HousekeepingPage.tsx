@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../components/Sidebar'
-import type { HousekeepingTask, TaskStatus } from '../types/task'
+import type { HousekeepingTask, HouseTaskFilters, TaskStatus } from '../types/task'
 import { getTasksByProperty, startTask, completeTask, cancelTask } from '../api/task'
 import { useAuthStore } from '../store/authStore'
 import { AddTaskModal } from './housekeeping/AddTaskModal'
@@ -15,10 +15,10 @@ const STATUS_TABS: { label: string; value: TaskStatus | 'All' }[] = [
 ]
 
 const STATUS_STYLE: Record<TaskStatus, { badge: string; dot: string }> = {
-  Pending:    { badge: 'bg-amber-500/10 text-amber-400',  dot: 'bg-amber-400' },
+  Pending:    { badge: 'bg-amber-500/10 text-amber-400',   dot: 'bg-amber-400' },
   InProgress: { badge: 'bg-violet-500/10 text-violet-400', dot: 'bg-violet-400' },
-  Completed:  { badge: 'bg-cyan-500/10 text-cyan-400',    dot: 'bg-cyan-400' },
-  Cancelled:  { badge: 'bg-rose-500/10 text-rose-400',    dot: 'bg-rose-400' },
+  Completed:  { badge: 'bg-cyan-500/10 text-cyan-400',     dot: 'bg-cyan-400' },
+  Cancelled:  { badge: 'bg-rose-500/10 text-rose-400',     dot: 'bg-rose-400' },
 }
 
 const STATUS_LABEL: Record<TaskStatus, string> = {
@@ -28,9 +28,16 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   Cancelled:  'Cancelled',
 }
 
+const SORT_OPTIONS = [
+  { label: 'Scheduled date', value: 'scheduledAt' },
+  { label: 'Status',         value: 'status' },
+]
+
 function fmt(date: string) {
   return new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
+
+const EMPTY_FILTERS: HouseTaskFilters = {}
 
 export function HousekeepingPage() {
   const user = useAuthStore((s) => s.user)
@@ -44,20 +51,27 @@ export function HousekeepingPage() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [filters, setFilters] = useState<HouseTaskFilters>(EMPTY_FILTERS)
+
+  const hasActiveFilters = !!(filters.ScheduledFrom || filters.ScheduledTo || filters.SortBy)
 
   const fetchTasks = useCallback(() => {
     if (!propertyId) return
     setLoading(true)
-    const filters = activeStatus !== 'All' ? { Status: activeStatus as TaskStatus } : undefined
-    getTasksByProperty(propertyId, filters, page)
+    const apiFilters: HouseTaskFilters = {
+      ...filters,
+      ...(activeStatus !== 'All' ? { Status: activeStatus as TaskStatus } : {}),
+    }
+    getTasksByProperty(propertyId, apiFilters, page)
       .then((data) => { setTasks(data.items); setTotalPages(data.totalPages) })
       .finally(() => setLoading(false))
-  }, [propertyId, activeStatus, page])
+  }, [propertyId, activeStatus, page, filters])
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchTasks()
-  }, [fetchTasks])
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { fetchTasks() }, [fetchTasks])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setPage(1) }, [filters, activeStatus])
 
   const handleStart = async (id: string) => {
     setActionLoading(id)
@@ -86,6 +100,7 @@ export function HousekeepingPage() {
         <Sidebar />
 
         <main className="flex-1 p-8 overflow-y-auto">
+          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">Housekeeping</h1>
@@ -104,11 +119,12 @@ export function HousekeepingPage() {
             )}
           </div>
 
-          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-6">
+          {/* Status tabs */}
+          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-4">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => { setActiveStatus(tab.value); setPage(1) }}
+                onClick={() => setActiveStatus(tab.value)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
@@ -118,6 +134,90 @@ export function HousekeepingPage() {
             ))}
           </div>
 
+          {/* Filter bar */}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            {/* Scheduled from */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 font-medium">From</label>
+              <input
+                type="date"
+                value={filters.ScheduledFrom ?? ''}
+                onChange={(e) => setFilters((f) => ({ ...f, ScheduledFrom: e.target.value || undefined }))}
+                className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 [color-scheme:dark]"
+              />
+            </div>
+
+            {/* Scheduled to */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 font-medium">To</label>
+              <input
+                type="date"
+                value={filters.ScheduledTo ?? ''}
+                onChange={(e) => setFilters((f) => ({ ...f, ScheduledTo: e.target.value || undefined }))}
+                className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 [color-scheme:dark]"
+              />
+            </div>
+
+            {/* Sort by */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 font-medium">Sort by</label>
+              <select
+                value={filters.SortBy ?? ''}
+                onChange={(e) => setFilters((f) => ({ ...f, SortBy: e.target.value || undefined }))}
+                className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              >
+                <option value="">Default</option>
+                {SORT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Asc / Desc toggle — only shown when a sort is selected */}
+            {filters.SortBy && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-slate-500 font-medium">Order</label>
+                <button
+                  onClick={() => setFilters((f) => ({ ...f, SortDescending: !f.SortDescending }))}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white hover:bg-slate-700 transition-colors"
+                >
+                  {filters.SortDescending ? (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                      </svg>
+                      Desc
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                      </svg>
+                      Asc
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Clear button */}
+            {hasActiveFilters && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-slate-500 font-medium opacity-0">Clear</label>
+                <button
+                  onClick={() => setFilters(EMPTY_FILTERS)}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-sm text-rose-400 hover:bg-rose-500/20 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Table */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>

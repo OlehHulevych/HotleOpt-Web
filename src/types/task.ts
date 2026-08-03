@@ -15,9 +15,9 @@ export interface HousekeepingTask  {
 }
 
 export interface HouseTaskFilters {
-    Status:TaskStatus,
-    ScheduledFrom:string,
-    ScheduledTo:string,
-    SortBy:string,
-    SortDescending:boolean,
+    Status?: TaskStatus,
+    ScheduledFrom?: string,
+    ScheduledTo?: string,
+    SortBy?: string,
+    SortDescending?: boolean,
 }
