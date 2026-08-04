@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type { Booking, BookingFilters, BookingStatus } from '../types/booking'
 import { getBookingsByProperty, checkIn, checkOut, cancelBooking } from '../api/bookings'
@@ -8,12 +9,12 @@ import { InvoiceModal } from './bookings/InvoiceModal.tsx'
 import { Pagination } from '../components/Pagination'
 import { toast } from 'sonner'
 
-const STATUS_TABS: { label: string; value: BookingStatus | 'All' }[] = [
-  { label: 'All', value: 'All' },
-  { label: 'Confirmed', value: 'Confirmed' },
-  { label: 'Checked In', value: 'CheckedIn' },
-  { label: 'Checked Out', value: 'CheckedOut' },
-  { label: 'Cancelled', value: 'Cancelled' },
+const STATUS_TABS: { labelKey: string; value: BookingStatus | 'All' }[] = [
+  { labelKey: 'common.all', value: 'All' },
+  { labelKey: 'status.confirmed', value: 'Confirmed' },
+  { labelKey: 'status.checkedIn', value: 'CheckedIn' },
+  { labelKey: 'status.checkedOut', value: 'CheckedOut' },
+  { labelKey: 'status.cancelled', value: 'Cancelled' },
 ]
 
 const STATUS_STYLE: Record<BookingStatus, string> = {
@@ -23,11 +24,11 @@ const STATUS_STYLE: Record<BookingStatus, string> = {
   Cancelled:  'bg-rose-500/10 text-rose-400',
 }
 
-const STATUS_LABEL: Record<BookingStatus, string> = {
-  Confirmed:  'Confirmed',
-  CheckedIn:  'Checked In',
-  CheckedOut: 'Checked Out',
-  Cancelled:  'Cancelled',
+const STATUS_KEY: Record<BookingStatus, string> = {
+  Confirmed:  'status.confirmed',
+  CheckedIn:  'status.checkedIn',
+  CheckedOut: 'status.checkedOut',
+  Cancelled:  'status.cancelled',
 }
 
 const SORT_OPTIONS = [
@@ -48,6 +49,7 @@ function fmt(date: string) {
 const EMPTY_FILTERS: BookingFilters = {}
 
 export default function BookingsPage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const isManager = user?.role === 'Manager'
   const propertyId = user?.propertyId
@@ -121,10 +123,9 @@ export default function BookingsPage() {
         <Sidebar />
 
         <main className="flex-1 p-8 overflow-y-auto">
-          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-xl font-semibold text-white">Bookings</h1>
+              <h1 className="text-xl font-semibold text-white">{t('bookings.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{bookings.length} total</p>
             </div>
             {isManager && (
@@ -135,12 +136,11 @@ export default function BookingsPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                New Booking
+                {t('bookings.newBooking')}
               </button>
             )}
           </div>
 
-          {/* Status tabs */}
           <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-4">
             {STATUS_TABS.map((tab) => (
               <button
@@ -150,16 +150,14 @@ export default function BookingsPage() {
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {tab.label}
+                {t(tab.labelKey)}
               </button>
             ))}
           </div>
 
-          {/* Filter bar */}
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            {/* Check-in from */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">Check-in from</label>
+              <label className="text-xs text-slate-500 font-medium">{t('bookings.checkIn')} {t('common.from')}</label>
               <input
                 type="date"
                 value={filters.checkInFrom ?? ''}
@@ -168,9 +166,8 @@ export default function BookingsPage() {
               />
             </div>
 
-            {/* Check-in to */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">Check-in to</label>
+              <label className="text-xs text-slate-500 font-medium">{t('bookings.checkIn')} {t('common.to')}</label>
               <input
                 type="date"
                 value={filters.checkInTo ?? ''}
@@ -179,9 +176,8 @@ export default function BookingsPage() {
               />
             </div>
 
-            {/* Sort by */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">Sort by</label>
+              <label className="text-xs text-slate-500 font-medium">{t('common.sortBy')}</label>
               <select
                 value={filters.sortBy ?? ''}
                 onChange={(e) => setFilters((f) => ({ ...f, sortBy: e.target.value || undefined }))}
@@ -194,10 +190,9 @@ export default function BookingsPage() {
               </select>
             </div>
 
-            {/* Asc / Desc toggle */}
             {filters.sortBy && (
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-slate-500 font-medium">Order</label>
+                <label className="text-xs text-slate-500 font-medium">{t('common.order')}</label>
                 <button
                   onClick={() => setFilters((f) => ({ ...f, sortDescending: !f.sortDescending }))}
                   className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white hover:bg-slate-700 transition-colors"
@@ -207,24 +202,23 @@ export default function BookingsPage() {
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                       </svg>
-                      Desc
+                      {t('common.desc')}
                     </>
                   ) : (
                     <>
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
                       </svg>
-                      Asc
+                      {t('common.asc')}
                     </>
                   )}
                 </button>
               </div>
             )}
 
-            {/* Clear */}
             {hasActiveFilters && (
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-slate-500 font-medium opacity-0">Clear</label>
+                <label className="text-xs text-slate-500 font-medium opacity-0">{t('common.clear')}</label>
                 <button
                   onClick={() => setFilters(EMPTY_FILTERS)}
                   className="flex items-center gap-1.5 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-sm text-rose-400 hover:bg-rose-500/20 transition-colors"
@@ -232,23 +226,22 @@ export default function BookingsPage() {
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  Clear
+                  {t('common.clear')}
                 </button>
               </div>
             )}
           </div>
 
-          {/* Table */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Guests</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Check-in</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Check-out</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Nights</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Status</th>
-                  <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Actions</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('bookings.guests')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('bookings.checkIn')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('bookings.checkOut')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('bookings.nights')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.status')}</th>
+                  <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -263,7 +256,7 @@ export default function BookingsPage() {
                   </tr>
                 ) : bookings.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-16 text-slate-500 text-sm">No bookings found</td>
+                    <td colSpan={6} className="text-center py-16 text-slate-500 text-sm">{t('bookings.empty')}</td>
                   </tr>
                 ) : (
                   bookings.map((b) => (
@@ -279,7 +272,7 @@ export default function BookingsPage() {
                       <td className="px-5 py-4 text-slate-300">{nights(b.checkInDate, b.checkOutDate)}</td>
                       <td className="px-5 py-4">
                         <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${STATUS_STYLE[b.status]}`}>
-                          {STATUS_LABEL[b.status]}
+                          {t(STATUS_KEY[b.status])}
                         </span>
                       </td>
                       <td className="px-5 py-4">
@@ -290,7 +283,7 @@ export default function BookingsPage() {
                               disabled={actionLoading === b.id}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors disabled:opacity-50"
                             >
-                              Check In
+                              {t('bookings.checkInAction')}
                             </button>
                           )}
                           {b.status === 'CheckedIn' && (
@@ -299,7 +292,7 @@ export default function BookingsPage() {
                               disabled={actionLoading === b.id}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors disabled:opacity-50"
                             >
-                              Check Out
+                              {t('bookings.checkOutAction')}
                             </button>
                           )}
                           {b.status === 'CheckedOut' && (
@@ -307,7 +300,7 @@ export default function BookingsPage() {
                               onClick={() => setInvoiceBookingId(b.id)}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
                             >
-                              Invoice
+                              {t('bookings.invoice')}
                             </button>
                           )}
                           {isManager && (b.status === 'Confirmed' || b.status === 'CheckedIn') && (
@@ -316,7 +309,7 @@ export default function BookingsPage() {
                               disabled={actionLoading === b.id}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50"
                             >
-                              Cancel
+                              {t('common.cancel')}
                             </button>
                           )}
                         </div>

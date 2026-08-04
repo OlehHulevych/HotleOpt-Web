@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type { Room, RoomStatus } from '../types/room'
 import { getRoomsByProperty } from '../api/rooms'
@@ -11,6 +12,7 @@ import { EditRoomModal } from './rooms/EditRoomModal'
 import {Pagination} from "../components/Pagination.tsx";
 
 export function RoomsPage() {
+  const { t } = useTranslation()
   const [rooms, setRooms] = useState<Room[]>([])
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [editRoom, setEditRoom] = useState<Room | null>(null)
@@ -54,7 +56,7 @@ export function RoomsPage() {
         <main className="flex-1 p-8 overflow-y-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-xl font-semibold text-white">Rooms</h1>
+              <h1 className="text-xl font-semibold text-white">{t('rooms.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{rooms.length} total</p>
             </div>
             {isManager && (
@@ -65,7 +67,7 @@ export function RoomsPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Room
+                {t('rooms.addRoom')}
               </button>
             )}
           </div>
@@ -80,7 +82,7 @@ export function RoomsPage() {
                     activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  {tab.label}
+                  {t(tab.labelKey)}
                 </button>
               ))}
             </div>
@@ -110,7 +112,7 @@ export function RoomsPage() {
               <svg className="w-10 h-10 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
-              <p className="text-sm">No rooms found</p>
+              <p className="text-sm">{t('rooms.empty')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">

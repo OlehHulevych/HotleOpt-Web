@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type { HousekeepingTask, HouseTaskFilters, TaskStatus } from '../types/task'
 import { getTasksByProperty, startTask, completeTask, cancelTask } from '../api/task'
@@ -7,12 +8,12 @@ import { AddTaskModal } from './housekeeping/AddTaskModal'
 import { Pagination } from '../components/Pagination'
 import { TranslateButton } from '../components/TranslateButton'
 
-const STATUS_TABS: { label: string; value: TaskStatus | 'All' }[] = [
-  { label: 'All', value: 'All' },
-  { label: 'Pending', value: 'Pending' },
-  { label: 'In Progress', value: 'InProgress' },
-  { label: 'Completed', value: 'Completed' },
-  { label: 'Cancelled', value: 'Cancelled' },
+const STATUS_TABS: { labelKey: string; value: TaskStatus | 'All' }[] = [
+  { labelKey: 'common.all', value: 'All' },
+  { labelKey: 'status.pending', value: 'Pending' },
+  { labelKey: 'status.inProgress', value: 'InProgress' },
+  { labelKey: 'status.completed', value: 'Completed' },
+  { labelKey: 'status.cancelled', value: 'Cancelled' },
 ]
 
 const STATUS_STYLE: Record<TaskStatus, { badge: string; dot: string }> = {
@@ -22,11 +23,11 @@ const STATUS_STYLE: Record<TaskStatus, { badge: string; dot: string }> = {
   Cancelled:  { badge: 'bg-rose-500/10 text-rose-400',     dot: 'bg-rose-400' },
 }
 
-const STATUS_LABEL: Record<TaskStatus, string> = {
-  Pending:    'Pending',
-  InProgress: 'In Progress',
-  Completed:  'Completed',
-  Cancelled:  'Cancelled',
+const STATUS_KEY: Record<TaskStatus, string> = {
+  Pending:    'status.pending',
+  InProgress: 'status.inProgress',
+  Completed:  'status.completed',
+  Cancelled:  'status.cancelled',
 }
 
 const SORT_OPTIONS = [
@@ -41,6 +42,7 @@ function fmt(date: string) {
 const EMPTY_FILTERS: HouseTaskFilters = {}
 
 export function HousekeepingPage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const isManager = user?.role === 'Manager'
   const propertyId = user?.propertyId
@@ -101,11 +103,10 @@ export function HousekeepingPage() {
         <Sidebar />
 
         <main className="flex-1 p-8 overflow-y-auto">
-          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-xl font-semibold text-white">Housekeeping</h1>
-              <p className="text-slate-400 text-sm mt-0.5">{tasks.length} tasks</p>
+              <h1 className="text-xl font-semibold text-white">{t('housekeeping.title')}</h1>
+              <p className="text-slate-400 text-sm mt-0.5">{tasks.length} {t('housekeeping.task').toLowerCase()}s</p>
             </div>
             {isManager && (
               <button
@@ -115,12 +116,11 @@ export function HousekeepingPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Task
+                {t('housekeeping.addTask')}
               </button>
             )}
           </div>
 
-          {/* Status tabs */}
           <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-4">
             {STATUS_TABS.map((tab) => (
               <button
@@ -130,16 +130,14 @@ export function HousekeepingPage() {
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {tab.label}
+                {t(tab.labelKey)}
               </button>
             ))}
           </div>
 
-          {/* Filter bar */}
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            {/* Scheduled from */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">From</label>
+              <label className="text-xs text-slate-500 font-medium">{t('common.from')}</label>
               <input
                 type="date"
                 value={filters.ScheduledFrom ?? ''}
@@ -148,9 +146,8 @@ export function HousekeepingPage() {
               />
             </div>
 
-            {/* Scheduled to */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">To</label>
+              <label className="text-xs text-slate-500 font-medium">{t('common.to')}</label>
               <input
                 type="date"
                 value={filters.ScheduledTo ?? ''}
@@ -159,9 +156,8 @@ export function HousekeepingPage() {
               />
             </div>
 
-            {/* Sort by */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">Sort by</label>
+              <label className="text-xs text-slate-500 font-medium">{t('common.sortBy')}</label>
               <select
                 value={filters.SortBy ?? ''}
                 onChange={(e) => setFilters((f) => ({ ...f, SortBy: e.target.value || undefined }))}
@@ -174,10 +170,9 @@ export function HousekeepingPage() {
               </select>
             </div>
 
-            {/* Asc / Desc toggle — only shown when a sort is selected */}
             {filters.SortBy && (
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-slate-500 font-medium">Order</label>
+                <label className="text-xs text-slate-500 font-medium">{t('common.order')}</label>
                 <button
                   onClick={() => setFilters((f) => ({ ...f, SortDescending: !f.SortDescending }))}
                   className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white hover:bg-slate-700 transition-colors"
@@ -187,24 +182,23 @@ export function HousekeepingPage() {
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                       </svg>
-                      Desc
+                      {t('common.desc')}
                     </>
                   ) : (
                     <>
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
                       </svg>
-                      Asc
+                      {t('common.asc')}
                     </>
                   )}
                 </button>
               </div>
             )}
 
-            {/* Clear button */}
             {hasActiveFilters && (
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-slate-500 font-medium opacity-0">Clear</label>
+                <label className="text-xs text-slate-500 font-medium opacity-0">{t('common.clear')}</label>
                 <button
                   onClick={() => setFilters(EMPTY_FILTERS)}
                   className="flex items-center gap-1.5 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-sm text-rose-400 hover:bg-rose-500/20 transition-colors"
@@ -212,22 +206,21 @@ export function HousekeepingPage() {
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  Clear
+                  {t('common.clear')}
                 </button>
               </div>
             )}
           </div>
 
-          {/* Table */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Task</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Assigned To</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Scheduled</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Status</th>
-                  <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Actions</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('housekeeping.task')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('housekeeping.assignedTo')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('housekeeping.scheduled')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.status')}</th>
+                  <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -242,52 +235,52 @@ export function HousekeepingPage() {
                   </tr>
                 ) : tasks.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-16 text-slate-500 text-sm">No tasks found</td>
+                    <td colSpan={5} className="text-center py-16 text-slate-500 text-sm">{t('housekeeping.empty')}</td>
                   </tr>
                 ) : (
-                  tasks.map((t) => {
-                    const style = STATUS_STYLE[t.status]
+                  tasks.map((task) => {
+                    const style = STATUS_STYLE[task.status]
                     return (
-                      <tr key={t.id} className="border-b border-slate-700/50 hover:bg-slate-700/20 transition-colors">
+                      <tr key={task.id} className="border-b border-slate-700/50 hover:bg-slate-700/20 transition-colors">
                         <td className="px-5 py-4">
-                          <TranslateButton text={t.title} className="text-white font-medium" />
-                          <p className="text-xs text-slate-500 mt-0.5">Room {t.roomNumber}</p>
+                          <TranslateButton text={task.title} className="text-white font-medium" />
+                          <p className="text-xs text-slate-500 mt-0.5">Room {task.roomNumber}</p>
                         </td>
-                        <td className="px-5 py-4 text-slate-300">{t.assignedToName ?? '—'}</td>
-                        <td className="px-5 py-4 text-slate-300">{fmt(t.scheduledAt)}</td>
+                        <td className="px-5 py-4 text-slate-300">{task.assignedToName ?? '—'}</td>
+                        <td className="px-5 py-4 text-slate-300">{fmt(task.scheduledAt)}</td>
                         <td className="px-5 py-4">
                           <span className={`flex items-center gap-1.5 w-fit px-2.5 py-1 rounded-lg text-xs font-medium ${style.badge}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
-                            {STATUS_LABEL[t.status]}
+                            {t(STATUS_KEY[task.status])}
                           </span>
                         </td>
                         <td className="px-5 py-4">
                           <div className="flex items-center justify-end gap-2">
-                            {t.status === 'Pending' && (
+                            {task.status === 'Pending' && (
                               <button
-                                onClick={() => handleStart(t.id)}
-                                disabled={actionLoading === t.id}
+                                onClick={() => handleStart(task.id)}
+                                disabled={actionLoading === task.id}
                                 className="px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors disabled:opacity-50"
                               >
-                                Start
+                                {t('housekeeping.start')}
                               </button>
                             )}
-                            {t.status === 'InProgress' && (
+                            {task.status === 'InProgress' && (
                               <button
-                                onClick={() => handleComplete(t.id)}
-                                disabled={actionLoading === t.id}
+                                onClick={() => handleComplete(task.id)}
+                                disabled={actionLoading === task.id}
                                 className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors disabled:opacity-50"
                               >
-                                Complete
+                                {t('housekeeping.complete')}
                               </button>
                             )}
-                            {isManager && (t.status === 'Pending' || t.status === 'InProgress') && (
+                            {isManager && (task.status === 'Pending' || task.status === 'InProgress') && (
                               <button
-                                onClick={() => handleCancel(t.id)}
-                                disabled={actionLoading === t.id}
+                                onClick={() => handleCancel(task.id)}
+                                disabled={actionLoading === task.id}
                                 className="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50"
                               >
-                                Cancel
+                                {t('common.cancel')}
                               </button>
                             )}
                           </div>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type { MaintenanceTicket, TicketFilters, TicketStatus, TicketPriority } from '../types/ticket'
 import { getTicketsByProperty, resolveTicket, closeTicket, deleteTicket } from '../api/tickets'
@@ -7,12 +8,12 @@ import { AddTicketModal } from './maintenance/AddTicketModal'
 import { Pagination } from '../components/Pagination'
 import { TranslateButton } from '../components/TranslateButton'
 
-const STATUS_TABS: { label: string; value: TicketStatus | 'All' }[] = [
-  { label: 'All', value: 'All' },
-  { label: 'Open', value: 'Open' },
-  { label: 'In Progress', value: 'InProgress' },
-  { label: 'Resolved', value: 'Resolved' },
-  { label: 'Closed', value: 'Closed' },
+const STATUS_TABS: { labelKey: string; value: TicketStatus | 'All' }[] = [
+  { labelKey: 'common.all', value: 'All' },
+  { labelKey: 'status.open', value: 'Open' },
+  { labelKey: 'status.inProgress', value: 'InProgress' },
+  { labelKey: 'status.resolved', value: 'Resolved' },
+  { labelKey: 'status.closed', value: 'Closed' },
 ]
 
 const STATUS_STYLE: Record<TicketStatus, { badge: string; dot: string }> = {
@@ -22,11 +23,11 @@ const STATUS_STYLE: Record<TicketStatus, { badge: string; dot: string }> = {
   Closed:     { badge: 'bg-slate-500/10 text-slate-400',   dot: 'bg-slate-400' },
 }
 
-const STATUS_LABEL: Record<TicketStatus, string> = {
-  Open:       'Open',
-  InProgress: 'In Progress',
-  Resolved:   'Resolved',
-  Closed:     'Closed',
+const STATUS_KEY: Record<TicketStatus, string> = {
+  Open:       'status.open',
+  InProgress: 'status.inProgress',
+  Resolved:   'status.resolved',
+  Closed:     'status.closed',
 }
 
 const PRIORITY_STYLE: Record<TicketPriority, string> = {
@@ -54,6 +55,7 @@ const SORT_OPTIONS = [
 const EMPTY_FILTERS: TicketFilters = {}
 
 export function MaintenancePage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const isManager = user?.role === 'Manager'
   const propertyId = user?.propertyId
@@ -113,11 +115,10 @@ export function MaintenancePage() {
         <Sidebar />
 
         <main className="flex-1 p-8 overflow-y-auto">
-          {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-xl font-semibold text-white">Maintenance</h1>
-              <p className="text-slate-400 text-sm mt-0.5">{tickets.length} tickets</p>
+              <h1 className="text-xl font-semibold text-white">{t('maintenance.title')}</h1>
+              <p className="text-slate-400 text-sm mt-0.5">{tickets.length} {t('maintenance.ticket').toLowerCase()}s</p>
             </div>
             {isManager && (
               <button
@@ -127,12 +128,11 @@ export function MaintenancePage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                New Ticket
+                {t('maintenance.addTicket')}
               </button>
             )}
           </div>
 
-          {/* Status tabs */}
           <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-4">
             {STATUS_TABS.map((tab) => (
               <button
@@ -142,16 +142,14 @@ export function MaintenancePage() {
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {tab.label}
+                {t(tab.labelKey)}
               </button>
             ))}
           </div>
 
-          {/* Filter bar */}
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            {/* Priority toggle buttons */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">Priority</label>
+              <label className="text-xs text-slate-500 font-medium">{t('maintenance.priority')}</label>
               <div className="flex gap-1">
                 {PRIORITIES.map((p) => (
                   <button
@@ -169,9 +167,8 @@ export function MaintenancePage() {
               </div>
             </div>
 
-            {/* Created from */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">From</label>
+              <label className="text-xs text-slate-500 font-medium">{t('common.from')}</label>
               <input
                 type="date"
                 value={filters.CreatedFrom ?? ''}
@@ -180,9 +177,8 @@ export function MaintenancePage() {
               />
             </div>
 
-            {/* Created to */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">To</label>
+              <label className="text-xs text-slate-500 font-medium">{t('common.to')}</label>
               <input
                 type="date"
                 value={filters.CreatedTo ?? ''}
@@ -191,9 +187,8 @@ export function MaintenancePage() {
               />
             </div>
 
-            {/* Sort by */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium">Sort by</label>
+              <label className="text-xs text-slate-500 font-medium">{t('common.sortBy')}</label>
               <select
                 value={filters.SortBy ?? ''}
                 onChange={(e) => setFilters((f) => ({ ...f, SortBy: e.target.value || undefined }))}
@@ -206,10 +201,9 @@ export function MaintenancePage() {
               </select>
             </div>
 
-            {/* Asc / Desc toggle */}
             {filters.SortBy && (
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-slate-500 font-medium">Order</label>
+                <label className="text-xs text-slate-500 font-medium">{t('common.order')}</label>
                 <button
                   onClick={() => setFilters((f) => ({ ...f, SortDescending: !f.SortDescending }))}
                   className="flex items-center gap-1.5 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white hover:bg-slate-700 transition-colors"
@@ -219,24 +213,23 @@ export function MaintenancePage() {
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
                       </svg>
-                      Desc
+                      {t('common.desc')}
                     </>
                   ) : (
                     <>
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
                       </svg>
-                      Asc
+                      {t('common.asc')}
                     </>
                   )}
                 </button>
               </div>
             )}
 
-            {/* Clear */}
             {hasActiveFilters && (
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-slate-500 font-medium opacity-0">Clear</label>
+                <label className="text-xs text-slate-500 font-medium opacity-0">{t('common.clear')}</label>
                 <button
                   onClick={() => setFilters(EMPTY_FILTERS)}
                   className="flex items-center gap-1.5 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-sm text-rose-400 hover:bg-rose-500/20 transition-colors"
@@ -244,22 +237,21 @@ export function MaintenancePage() {
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                  Clear
+                  {t('common.clear')}
                 </button>
               </div>
             )}
           </div>
 
-          {/* Table */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Ticket</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Assigned To</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Priority</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Status</th>
-                  <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Actions</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('maintenance.ticket')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('maintenance.assignedTo')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('maintenance.priority')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.status')}</th>
+                  <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -274,54 +266,54 @@ export function MaintenancePage() {
                   </tr>
                 ) : tickets.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-16 text-slate-500 text-sm">No tickets found</td>
+                    <td colSpan={5} className="text-center py-16 text-slate-500 text-sm">{t('maintenance.empty')}</td>
                   </tr>
                 ) : (
-                  tickets.map((t) => (
-                    <tr key={t.id} className="border-b border-slate-700/50 hover:bg-slate-700/20 transition-colors">
+                  tickets.map((ticket) => (
+                    <tr key={ticket.id} className="border-b border-slate-700/50 hover:bg-slate-700/20 transition-colors">
                       <td className="px-5 py-4">
-                        <TranslateButton text={t.title} className="text-white font-medium" />
-                        <p className="text-xs text-slate-500 mt-0.5">Room #{t.roomNumber} · {t.description}</p>
+                        <TranslateButton text={ticket.title} className="text-white font-medium" />
+                        <p className="text-xs text-slate-500 mt-0.5">Room #{ticket.roomNumber} · {ticket.description}</p>
                       </td>
-                      <td className="px-5 py-4 text-slate-300">{t.staffName}</td>
+                      <td className="px-5 py-4 text-slate-300">{ticket.staffName}</td>
                       <td className="px-5 py-4">
-                        <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${PRIORITY_STYLE[t.priority]}`}>
-                          {t.priority}
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-medium ${PRIORITY_STYLE[ticket.priority]}`}>
+                          {ticket.priority}
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        <span className={`flex items-center gap-1.5 w-fit px-2.5 py-1 rounded-lg text-xs font-medium ${STATUS_STYLE[t.status].badge}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${STATUS_STYLE[t.status].dot}`} />
-                          {STATUS_LABEL[t.status]}
+                        <span className={`flex items-center gap-1.5 w-fit px-2.5 py-1 rounded-lg text-xs font-medium ${STATUS_STYLE[ticket.status].badge}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${STATUS_STYLE[ticket.status].dot}`} />
+                          {t(STATUS_KEY[ticket.status])}
                         </span>
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex items-center justify-end gap-2">
-                          {(t.status === 'Open' || t.status === 'InProgress') && (
+                          {(ticket.status === 'Open' || ticket.status === 'InProgress') && (
                             <button
-                              onClick={() => handleResolve(t.id)}
-                              disabled={actionLoading === t.id}
+                              onClick={() => handleResolve(ticket.id)}
+                              disabled={actionLoading === ticket.id}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors disabled:opacity-50"
                             >
-                              Resolve
+                              {t('maintenance.resolve')}
                             </button>
                           )}
-                          {isManager && t.status === 'Resolved' && (
+                          {isManager && ticket.status === 'Resolved' && (
                             <button
-                              onClick={() => handleClose(t.id)}
-                              disabled={actionLoading === t.id}
+                              onClick={() => handleClose(ticket.id)}
+                              disabled={actionLoading === ticket.id}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-500/10 text-slate-400 hover:bg-slate-500/20 transition-colors disabled:opacity-50"
                             >
-                              Close
+                              {t('common.close')}
                             </button>
                           )}
                           {isManager && (
                             <button
-                              onClick={() => setConfirmDelete(t.id)}
-                              disabled={actionLoading === t.id}
+                              onClick={() => setConfirmDelete(ticket.id)}
+                              disabled={actionLoading === ticket.id}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50"
                             >
-                              Delete
+                              {t('common.delete')}
                             </button>
                           )}
                         </div>
@@ -346,14 +338,14 @@ export function MaintenancePage() {
                 onClick={() => setConfirmDelete(null)}
                 className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition-colors"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
                 disabled={actionLoading === confirmDelete}
                 className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-400 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors"
               >
-                {actionLoading === confirmDelete ? 'Deleting...' : 'Delete'}
+                {actionLoading === confirmDelete ? '...' : t('common.delete')}
               </button>
             </div>
           </div>

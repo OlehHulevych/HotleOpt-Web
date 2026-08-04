@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type { Shift, ShiftStatus } from '../types/shift'
 import { getShiftsByProperty, deleteShift } from '../api/shifts'
@@ -6,12 +7,12 @@ import { useAuthStore } from '../store/authStore'
 import { AddShiftModal } from './shifts/AddShiftModal'
 import { Pagination } from '../components/Pagination'
 
-const STATUS_TABS: { label: string; value: ShiftStatus | 'All' }[] = [
-  { label: 'All', value: 'All' },
-  { label: 'Scheduled', value: 'Scheduled' },
-  { label: 'Active', value: 'Active' },
-  { label: 'Completed', value: 'Completed' },
-  { label: 'Cancelled', value: 'Cancelled' },
+const STATUS_TABS: { labelKey: string; value: ShiftStatus | 'All' }[] = [
+  { labelKey: 'common.all', value: 'All' },
+  { labelKey: 'status.scheduled', value: 'Scheduled' },
+  { labelKey: 'status.active', value: 'Active' },
+  { labelKey: 'status.completed', value: 'Completed' },
+  { labelKey: 'status.cancelled', value: 'Cancelled' },
 ]
 
 const STATUS_STYLE: Record<ShiftStatus, { badge: string; dot: string }> = {
@@ -19,6 +20,13 @@ const STATUS_STYLE: Record<ShiftStatus, { badge: string; dot: string }> = {
   Active:    { badge: 'bg-cyan-500/10 text-cyan-400',     dot: 'bg-cyan-400' },
   Completed: { badge: 'bg-slate-500/10 text-slate-400',   dot: 'bg-slate-400' },
   Cancelled: { badge: 'bg-rose-500/10 text-rose-400',     dot: 'bg-rose-400' },
+}
+
+const STATUS_KEY: Record<ShiftStatus, string> = {
+  Scheduled: 'status.scheduled',
+  Active:    'status.active',
+  Completed: 'status.completed',
+  Cancelled: 'status.cancelled',
 }
 
 function fmt(date: string) {
@@ -33,6 +41,7 @@ function duration(start: string, end: string) {
 }
 
 export function ShiftsPage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const isManager = user?.role === 'Manager'
   const propertyId = user?.propertyId
@@ -61,6 +70,7 @@ export function ShiftsPage() {
   }, [propertyId, activeStatus, page])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchShifts()
   }, [fetchShifts])
 
@@ -80,8 +90,8 @@ export function ShiftsPage() {
         <main className="flex-1 p-8 overflow-y-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-xl font-semibold text-white">Shifts</h1>
-              <p className="text-slate-400 text-sm mt-0.5">{shifts.length} shifts</p>
+              <h1 className="text-xl font-semibold text-white">{t('shifts.title')}</h1>
+              <p className="text-slate-400 text-sm mt-0.5">{shifts.length} {t('shifts.title').toLowerCase()}</p>
             </div>
             {isManager && (
               <button
@@ -91,7 +101,7 @@ export function ShiftsPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Shift
+                {t('shifts.addShift')}
               </button>
             )}
           </div>
@@ -105,7 +115,7 @@ export function ShiftsPage() {
                   activeStatus === tab.value ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {tab.label}
+                {t(tab.labelKey)}
               </button>
             ))}
           </div>
@@ -114,12 +124,12 @@ export function ShiftsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Staff</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Start</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">End</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Duration</th>
-                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Status</th>
-                  {isManager && <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Actions</th>}
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('shifts.staff')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('shifts.start')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('shifts.end')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('shifts.duration')}</th>
+                  <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.status')}</th>
+                  {isManager && <th className="text-right text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('common.actions')}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -134,7 +144,7 @@ export function ShiftsPage() {
                   </tr>
                 ) : shifts.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-16 text-slate-500 text-sm">No shifts found</td>
+                    <td colSpan={6} className="text-center py-16 text-slate-500 text-sm">{t('shifts.empty')}</td>
                   </tr>
                 ) : (
                   shifts.map((s) => (
@@ -146,7 +156,7 @@ export function ShiftsPage() {
                       <td className="px-5 py-4">
                         <span className={`flex items-center gap-1.5 w-fit px-2.5 py-1 rounded-lg text-xs font-medium ${STATUS_STYLE[s.status].badge}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${STATUS_STYLE[s.status].dot}`} />
-                          {s.status}
+                          {t(STATUS_KEY[s.status])}
                         </span>
                       </td>
                       {isManager && (
@@ -157,7 +167,7 @@ export function ShiftsPage() {
                               disabled={actionLoading === s.id}
                               className="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50"
                             >
-                              Delete
+                              {t('common.delete')}
                             </button>
                           </div>
                         </td>
@@ -182,14 +192,14 @@ export function ShiftsPage() {
                 onClick={() => setConfirmDelete(null)}
                 className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium rounded-xl transition-colors"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => handleDelete(confirmDelete)}
                 disabled={actionLoading === confirmDelete}
                 className="flex-1 py-2.5 bg-rose-500 hover:bg-rose-400 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors"
               >
-                {actionLoading === confirmDelete ? 'Deleting...' : 'Delete'}
+                {actionLoading === confirmDelete ? '...' : t('common.delete')}
               </button>
             </div>
           </div>

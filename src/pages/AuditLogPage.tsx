@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type { AuditLogDto, EntityAction } from '../types/audit'
 import { getAuditLogs } from '../api/audit'
@@ -30,6 +31,7 @@ function formatChanges(raw: string): string {
 }
 
 export function AuditLogPage() {
+  const { t } = useTranslation()
   const [logs, setLogs] = useState<AuditLogDto[]>([])
   const [userMap, setUserMap] = useState<Record<string, UserDto>>({})
   const [loading, setLoading] = useState(false)
@@ -68,50 +70,45 @@ export function AuditLogPage() {
       <Sidebar />
 
       <main className="flex-1 p-8 overflow-y-auto">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-xl font-semibold text-white">Audit Log</h1>
+            <h1 className="text-xl font-semibold text-white">{t('audit.title')}</h1>
             <p className="text-slate-400 text-sm mt-0.5">{filtered.length} entries</p>
           </div>
         </div>
 
-        {/* Filter bar */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
-          {/* Entity filter */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-slate-500 font-medium">Entity</label>
+            <label className="text-xs text-slate-500 font-medium">{t('audit.entity')}</label>
             <select
               value={entityFilter}
               onChange={(e) => setEntityFilter(e.target.value)}
               className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="">All entities</option>
+              <option value="">{t('audit.allEntities')}</option>
               {entityNames.map((n) => (
                 <option key={n} value={n}>{n}</option>
               ))}
             </select>
           </div>
 
-          {/* Action filter */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-slate-500 font-medium">Action</label>
+            <label className="text-xs text-slate-500 font-medium">{t('audit.action')}</label>
             <select
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value as EntityAction | '')}
               className="px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="">All actions</option>
+              <option value="">{t('audit.allActions')}</option>
               <option value="Created">Created</option>
               <option value="Updated">Updated</option>
               <option value="Deleted">Deleted</option>
             </select>
           </div>
 
-          {/* Clear */}
           {hasFilters && (
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 font-medium opacity-0">Clear</label>
+              <label className="text-xs text-slate-500 font-medium opacity-0">{t('common.clear')}</label>
               <button
                 onClick={() => { setEntityFilter(''); setActionFilter('') }}
                 className="flex items-center gap-1.5 px-3 py-2 bg-rose-500/10 border border-rose-500/20 rounded-lg text-sm text-rose-400 hover:bg-rose-500/20 transition-colors"
@@ -119,22 +116,21 @@ export function AuditLogPage() {
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                Clear
+                {t('common.clear')}
               </button>
             </div>
           )}
         </div>
 
-        {/* Table */}
         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-700">
-                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">When</th>
-                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Entity</th>
-                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Action</th>
-                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Changed by</th>
-                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">Changes</th>
+                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('audit.when')}</th>
+                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('audit.entity')}</th>
+                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('audit.action')}</th>
+                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('audit.changedBy')}</th>
+                <th className="text-left text-xs font-medium text-slate-500 uppercase tracking-wide px-5 py-3.5">{t('audit.changes')}</th>
               </tr>
             </thead>
             <tbody>
@@ -149,7 +145,7 @@ export function AuditLogPage() {
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-16 text-slate-500 text-sm">No audit entries found</td>
+                  <td colSpan={5} className="text-center py-16 text-slate-500 text-sm">{t('audit.empty')}</td>
                 </tr>
               ) : (
                 filtered.map((log) => {

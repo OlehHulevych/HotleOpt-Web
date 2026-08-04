@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import { useAuthStore } from '../store/authStore'
 import { uploadAvatar, getMe } from '../api/auth'
 
 export function ProfilePage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const setUser = useAuthStore((s) => s.setUser)
 
@@ -38,8 +40,8 @@ export function ProfilePage() {
 
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="mb-8">
-          <h1 className="text-xl font-semibold text-white">Profile</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Manage your account details</p>
+          <h1 className="text-xl font-semibold text-white">{t('profile.title')}</h1>
+          <p className="text-slate-400 text-sm mt-0.5">{t('profile.manageAccount')}</p>
         </div>
 
         <div className="max-w-lg">
@@ -75,7 +77,7 @@ export function ProfilePage() {
                   disabled={uploading}
                   className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
                 >
-                  {uploading ? 'Uploading...' : 'Change Avatar'}
+                  {uploading ? '...' : t('profile.changeAvatar')}
                 </button>
                 <p className="text-xs text-slate-500 mt-2">JPG, PNG or WEBP. Max 5MB.</p>
                 {error && <p className="text-xs text-rose-400 mt-1">{error}</p>}
@@ -92,24 +94,24 @@ export function ProfilePage() {
           </div>
 
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6">
-            <h2 className="text-sm font-medium text-white mb-5">Account Info</h2>
+            <h2 className="text-sm font-medium text-white mb-5">{t('profile.accountInfo')}</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1">First Name</label>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">{t('profile.firstName')}</label>
                   <p className="text-sm text-white bg-slate-800 border border-slate-700 rounded-xl px-3 py-2">{user?.firstName}</p>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 mb-1">Last Name</label>
+                  <label className="block text-xs font-medium text-slate-500 mb-1">{t('profile.lastName')}</label>
                   <p className="text-sm text-white bg-slate-800 border border-slate-700 rounded-xl px-3 py-2">{user?.secondName}</p>
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1">Email</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">{t('profile.email')}</label>
                 <p className="text-sm text-white bg-slate-800 border border-slate-700 rounded-xl px-3 py-2">{user?.email}</p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-500 mb-1">Role</label>
+                <label className="block text-xs font-medium text-slate-500 mb-1">{t('profile.role')}</label>
                 <p className="text-sm text-white bg-slate-800 border border-slate-700 rounded-xl px-3 py-2">{user?.role}</p>
               </div>
             </div>

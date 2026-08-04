@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { TaskTemplateDto } from '../../types/template'
 import type { Room } from '../../types/room'
 import type { UserDto } from '../../types/user'
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export function ApplyTemplateModal({ template, propertyId, onClose, onSuccess }: Props) {
+  const { t } = useTranslation()
   const [rooms, setRooms] = useState<Room[]>([])
   const [users, setUsers] = useState<UserDto[]>([])
   const [roomId, setRoomId] = useState('')
@@ -63,7 +65,7 @@ export function ApplyTemplateModal({ template, propertyId, onClose, onSuccess }:
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700">
           <div>
-            <h2 className="text-white font-semibold">Apply Template</h2>
+            <h2 className="text-white font-semibold">{t('templates.applyTemplate')}</h2>
             <p className="text-xs text-slate-500 mt-0.5">{template.name} · {template.items.length} tasks</p>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
@@ -76,7 +78,7 @@ export function ApplyTemplateModal({ template, propertyId, onClose, onSuccess }:
         <div className="px-6 py-5 space-y-4">
           {/* Checklist preview */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-3">
-            <p className="text-xs text-slate-500 mb-2 font-medium">Will create these tasks:</p>
+            <p className="text-xs text-slate-500 mb-2 font-medium">{t('templates.willCreate')}</p>
             <ul className="space-y-1">
               {template.items.map((item) => (
                 <li key={item.id} className="flex items-center gap-2 text-sm text-slate-300">
@@ -89,13 +91,13 @@ export function ApplyTemplateModal({ template, propertyId, onClose, onSuccess }:
 
           {/* Room */}
           <div>
-            <label className="block text-xs text-slate-500 font-medium mb-1">Room</label>
+            <label className="block text-xs text-slate-500 font-medium mb-1">{t('rooms.room')}</label>
             <select
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="">Select room…</option>
+              <option value="">{t('common.selectRoom')}</option>
               {rooms.map((r) => (
                 <option key={r.id} value={r.id}>Room {r.roomNumber} ({r.type})</option>
               ))}
@@ -104,13 +106,13 @@ export function ApplyTemplateModal({ template, propertyId, onClose, onSuccess }:
 
           {/* Assign to */}
           <div>
-            <label className="block text-xs text-slate-500 font-medium mb-1">Assign to</label>
+            <label className="block text-xs text-slate-500 font-medium mb-1">{t('templates.assignTo')}</label>
             <select
               value={assignedToId}
               onChange={(e) => setAssignedToId(e.target.value)}
               className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              <option value="">Select staff…</option>
+              <option value="">{t('common.selectStaff')}</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>{u.firstName} {u.secondName}</option>
               ))}
@@ -119,7 +121,7 @@ export function ApplyTemplateModal({ template, propertyId, onClose, onSuccess }:
 
           {/* Scheduled date */}
           <div>
-            <label className="block text-xs text-slate-500 font-medium mb-1">Scheduled date</label>
+            <label className="block text-xs text-slate-500 font-medium mb-1">{t('templates.scheduledDate')}</label>
             <input
               type="date"
               value={scheduledAt}
@@ -135,14 +137,14 @@ export function ApplyTemplateModal({ template, propertyId, onClose, onSuccess }:
             onClick={onClose}
             className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleApply}
             disabled={loading}
             className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            {loading ? 'Applying…' : `Apply (${template.items.length} tasks)`}
+            {loading ? t('templates.applying') : t('templates.applyTemplate')}
           </button>
         </div>
       </div>

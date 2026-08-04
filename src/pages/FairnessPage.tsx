@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type { StaffFairnessDto } from '../types/fairness'
 import { getStaffFairness } from '../api/fairness'
@@ -14,6 +15,7 @@ function initials(name: string) {
 }
 
 export function FairnessPage() {
+  const { t } = useTranslation()
   const [staff, setStaff] = useState<StaffFairnessDto[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -34,29 +36,26 @@ export function FairnessPage() {
       <Sidebar />
 
       <main className="flex-1 p-8 overflow-y-auto">
-        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-xl font-semibold text-white">Staff Fairness</h1>
-          <p className="text-slate-400 text-sm mt-0.5">Weekly task distribution — current calendar week</p>
+          <h1 className="text-xl font-semibold text-white">{t('fairness.title')}</h1>
+          <p className="text-slate-400 text-sm mt-0.5">{t('fairness.subtitle')}</p>
         </div>
 
-        {/* Summary cards */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5">
-            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">Total Staff</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">{t('fairness.totalStaff')}</p>
             <p className="text-3xl font-semibold text-white">{staff.length}</p>
           </div>
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5">
-            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">Avg Tasks / Person</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">{t('fairness.avgTasks')}</p>
             <p className="text-3xl font-semibold text-white">{avgTasks}</p>
           </div>
           <div className={`border rounded-2xl p-5 ${overloadedCount > 0 ? 'bg-rose-500/10 border-rose-500/30' : 'bg-slate-800/50 border-slate-700'}`}>
-            <p className={`text-xs uppercase tracking-wide font-medium mb-1 ${overloadedCount > 0 ? 'text-rose-400' : 'text-slate-500'}`}>Overloaded</p>
+            <p className={`text-xs uppercase tracking-wide font-medium mb-1 ${overloadedCount > 0 ? 'text-rose-400' : 'text-slate-500'}`}>{t('fairness.overloaded')}</p>
             <p className={`text-3xl font-semibold ${overloadedCount > 0 ? 'text-rose-400' : 'text-white'}`}>{overloadedCount}</p>
           </div>
         </div>
 
-        {/* Staff grid */}
         {loading ? (
           <div className="flex justify-center py-20">
             <svg className="animate-spin w-6 h-6 text-cyan-500" fill="none" viewBox="0 0 24 24">
@@ -65,7 +64,7 @@ export function FairnessPage() {
             </svg>
           </div>
         ) : staff.length === 0 ? (
-          <div className="text-center py-20 text-slate-500 text-sm">No staff data for this week</div>
+          <div className="text-center py-20 text-slate-500 text-sm">{t('fairness.empty')}</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {staff
@@ -79,7 +78,6 @@ export function FairnessPage() {
                       s.isOverloaded ? 'border-rose-500/40' : 'border-slate-700'
                     }`}
                   >
-                    {/* Top row */}
                     <div className="flex items-center gap-3 mb-4">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${
                         s.isOverloaded ? 'bg-rose-500/20 text-rose-400' : 'bg-cyan-500/20 text-cyan-400'
@@ -88,25 +86,23 @@ export function FairnessPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm truncate">{s.staffName}</p>
-                        <p className="text-xs text-slate-500">Staff</p>
+                        <p className="text-xs text-slate-500">{t('shifts.staff')}</p>
                       </div>
                       {s.isOverloaded && (
                         <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                          Overloaded
+                          {t('fairness.overloaded')}
                         </span>
                       )}
                     </div>
 
-                    {/* Task count */}
                     <div className="flex items-end justify-between mb-2">
-                      <span className="text-xs text-slate-500">Tasks this week</span>
+                      <span className="text-xs text-slate-500">{t('fairness.tasksThisWeek')}</span>
                       <span className={`text-lg font-semibold ${s.isOverloaded ? 'text-rose-400' : 'text-white'}`}>
                         {s.weeklyTaskCount}
                         <span className="text-xs text-slate-500 font-normal"> / {OVERLOAD_THRESHOLD}</span>
                       </span>
                     </div>
 
-                    {/* Progress bar */}
                     <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all ${s.isOverloaded ? 'bg-rose-500' : 'bg-cyan-500'}`}

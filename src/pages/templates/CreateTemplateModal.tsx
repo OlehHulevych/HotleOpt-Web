@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { RoomType } from '../../types/template'
 import { createTemplate } from '../../api/templates'
 import { toast } from 'sonner'
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function CreateTemplateModal({ isOpen, propertyId, onClose, onSuccess }: Props) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [roomType, setRoomType] = useState<RoomType>('Single')
   const [items, setItems] = useState<string[]>([''])
@@ -27,7 +29,7 @@ export function CreateTemplateModal({ isOpen, propertyId, onClose, onSuccess }: 
 
   const handleSubmit = async () => {
     if (!name.trim()) { toast.error('Template name is required'); return }
-    const filledItems = items.map((t) => t.trim()).filter(Boolean)
+    const filledItems = items.map((item) => item.trim()).filter(Boolean)
     if (filledItems.length === 0) { toast.error('Add at least one checklist item'); return }
 
     setLoading(true)
@@ -52,9 +54,8 @@ export function CreateTemplateModal({ isOpen, propertyId, onClose, onSuccess }: 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md mx-4 shadow-2xl max-h-[90vh] flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700 shrink-0">
-          <h2 className="text-white font-semibold">New Template</h2>
+          <h2 className="text-white font-semibold">{t('templates.newTemplate')}</h2>
           <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -63,9 +64,8 @@ export function CreateTemplateModal({ isOpen, propertyId, onClose, onSuccess }: 
         </div>
 
         <div className="px-6 py-5 overflow-y-auto flex-1 space-y-4">
-          {/* Name */}
           <div>
-            <label className="block text-xs text-slate-500 font-medium mb-1">Template name</label>
+            <label className="block text-xs text-slate-500 font-medium mb-1">{t('templates.name')}</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -74,21 +74,19 @@ export function CreateTemplateModal({ isOpen, propertyId, onClose, onSuccess }: 
             />
           </div>
 
-          {/* Room type */}
           <div>
-            <label className="block text-xs text-slate-500 font-medium mb-1">Room type</label>
+            <label className="block text-xs text-slate-500 font-medium mb-1">{t('templates.roomType')}</label>
             <select
               value={roomType}
               onChange={(e) => setRoomType(e.target.value as RoomType)}
               className="w-full px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
             >
-              {ROOM_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+              {ROOM_TYPES.map((rt) => <option key={rt} value={rt}>{rt}</option>)}
             </select>
           </div>
 
-          {/* Checklist items */}
           <div>
-            <label className="block text-xs text-slate-500 font-medium mb-2">Checklist items</label>
+            <label className="block text-xs text-slate-500 font-medium mb-2">{t('templates.checklistItems')}</label>
             <div className="space-y-2">
               {items.map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
@@ -100,10 +98,7 @@ export function CreateTemplateModal({ isOpen, propertyId, onClose, onSuccess }: 
                     className="flex-1 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
                   />
                   {items.length > 1 && (
-                    <button
-                      onClick={() => removeItem(i)}
-                      className="text-slate-500 hover:text-rose-400 transition-colors shrink-0"
-                    >
+                    <button onClick={() => removeItem(i)} className="text-slate-500 hover:text-rose-400 transition-colors shrink-0">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
@@ -112,32 +107,25 @@ export function CreateTemplateModal({ isOpen, propertyId, onClose, onSuccess }: 
                 </div>
               ))}
             </div>
-            <button
-              onClick={addItem}
-              className="mt-2 flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
+            <button onClick={addItem} className="mt-2 flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add item
+              {t('templates.addItem')}
             </button>
           </div>
         </div>
 
-        {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-700 flex justify-end gap-2 shrink-0">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
-          >
-            Cancel
+          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors">
+            {t('common.cancel')}
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
             className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            {loading ? 'Creating…' : 'Create'}
+            {loading ? t('common.creating') : t('common.create')}
           </button>
         </div>
       </div>

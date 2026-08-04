@@ -1,11 +1,11 @@
 import type { RoomStatus } from '../../types/room'
 
-export const STATUS_TABS: { label: string; value: RoomStatus | 'All' }[] = [
-  { label: 'All', value: 'All' },
-  { label: 'Available', value: 'Available' },
-  { label: 'Occupied', value: 'Occupied' },
-  { label: 'Cleaning', value: 'Cleaning' },
-  { label: 'Maintenance', value: 'Maintenance' },
+export const STATUS_TABS: { labelKey: string; value: RoomStatus | 'All' }[] = [
+  { labelKey: 'common.all', value: 'All' },
+  { labelKey: 'status.available', value: 'Available' },
+  { labelKey: 'status.occupied', value: 'Occupied' },
+  { labelKey: 'status.cleaning', value: 'Cleaning' },
+  { labelKey: 'status.maintenance', value: 'Maintenance' },
 ]
 
 export const STATUS_STYLE: Record<RoomStatus, { badge: string; dot: string }> = {

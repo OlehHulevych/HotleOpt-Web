@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Room, RoomPhoto } from '../../types/room'
 import { getPhotosByRoom, uploadPhoto } from '../../api/rooms'
 import { STATUS_STYLE, TYPE_STYLE } from './constants'
@@ -9,6 +10,7 @@ interface RoomDetailModalProps {
 }
 
 export function RoomDetailModal({ room, onClose }: RoomDetailModalProps) {
+  const { t } = useTranslation()
   const [photos, setPhotos] = useState<RoomPhoto[]>([])
 
   useEffect(() => {
@@ -31,14 +33,8 @@ export function RoomDetailModal({ room, onClose }: RoomDetailModalProps) {
   const typeStyle = TYPE_STYLE[room.type] ?? 'bg-slate-700 text-slate-300'
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md mx-4"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between mb-6">
           <div>
             <p className="text-3xl font-bold text-white">#{room.roomNumber}</p>
@@ -60,26 +56,26 @@ export function RoomDetailModal({ room, onClose }: RoomDetailModalProps) {
         </div>
 
         <div className="mb-6">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Description</p>
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">{t('common.description')}</p>
           <p className="text-slate-300 text-sm leading-relaxed">
-            {room.description || 'No description provided.'}
+            {room.description || t('rooms.noDescription')}
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-slate-800 rounded-xl p-3">
-            <p className="text-xs text-slate-500 mb-1">Type</p>
+            <p className="text-xs text-slate-500 mb-1">{t('rooms.type')}</p>
             <p className="text-sm text-white font-medium">{room.type}</p>
           </div>
           <div className="bg-slate-800 rounded-xl p-3">
-            <p className="text-xs text-slate-500 mb-1">Status</p>
+            <p className="text-xs text-slate-500 mb-1">{t('common.status')}</p>
             <p className="text-sm text-white font-medium">{room.status}</p>
           </div>
         </div>
 
         {photos.length > 0 && (
           <div className="mb-6">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Photos</p>
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">{t('rooms.photos')}</p>
             <div className="flex gap-2 overflow-x-auto pb-1">
               {photos.map((p) => (
                 <img
@@ -93,26 +89,16 @@ export function RoomDetailModal({ room, onClose }: RoomDetailModalProps) {
           </div>
         )}
 
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={uploadPhotosHandler}
-          className="hidden"
-          id="photo-upload"
-        />
+        <input type="file" accept="image/*" multiple onChange={uploadPhotosHandler} className="hidden" id="photo-upload" />
         <label
           htmlFor="photo-upload"
           className="w-full py-2.5 mb-2 text-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-colors cursor-pointer block"
         >
-          Upload Photos
+          {t('rooms.uploadPhotos')}
         </label>
 
-        <button
-          onClick={onClose}
-          className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-colors"
-        >
-          Close
+        <button onClick={onClose} className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-colors">
+          {t('common.close')}
         </button>
       </div>
     </div>

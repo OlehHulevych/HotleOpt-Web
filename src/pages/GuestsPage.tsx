@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import type {Guest} from '../types/guest'
 import {getGuests, deleteGuest} from '../api/guests'
@@ -8,6 +9,7 @@ import {EditGuestModal} from './guests/EditGuestModal'
 import { Pagination } from '../components/Pagination'
 
 export function GuestsPage() {
+  const { t } = useTranslation()
   const [guests, setGuests] = useState<Guest[]>([])
   const [editGuest, setEditGuest] = useState<Guest | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -49,7 +51,7 @@ export function GuestsPage() {
         <main className="flex-1 p-8 overflow-y-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-xl font-semibold text-white">Guests</h1>
+              <h1 className="text-xl font-semibold text-white">{t('guests.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{guests.length} total</p>
             </div>
             {isManager && (
@@ -60,7 +62,7 @@ export function GuestsPage() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Guest
+                {t('guests.addGuest')}
               </button>
             )}
           </div>
@@ -89,17 +91,17 @@ export function GuestsPage() {
               <svg className="w-10 h-10 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <p className="text-sm">No guests found</p>
+              <p className="text-sm">{t('guests.empty')}</p>
             </div>
           ) : (
             <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-700">
-                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">Name</th>
-                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">Email</th>
-                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">Phone</th>
-                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">Passport</th>
+                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">{t('guests.name')}</th>
+                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">{t('guests.email')}</th>
+                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">{t('guests.phone')}</th>
+                    <th className="text-left px-5 py-3 text-xs font-medium text-slate-400 uppercase tracking-wide">{t('guests.passport')}</th>
                     <th className="px-5 py-3" />
                   </tr>
                 </thead>
@@ -123,14 +125,14 @@ export function GuestsPage() {
                             onClick={() => setEditGuest(g)}
                             className="px-3 py-1.5 text-xs font-medium text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 rounded-lg transition-colors"
                           >
-                            Edit
+                            {t('common.edit')}
                           </button>
                           {isManager && (
                             <button
                               onClick={() => handleDelete(g.id)}
                               className="px-3 py-1.5 text-xs font-medium text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 rounded-lg transition-colors"
                             >
-                              Delete
+                              {t('common.delete')}
                             </button>
                           )}
                         </div>
