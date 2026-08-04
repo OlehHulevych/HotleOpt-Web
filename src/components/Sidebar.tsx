@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router'
 import { useAuthStore } from '../store/authStore'
+import { useLanguageStore, LANGUAGES, type SupportedLanguage } from '../store/languageStore'
 
 const navItems = [
   {
@@ -104,6 +105,7 @@ export default function Sidebar() {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
+  const { language, setLanguage } = useLanguageStore()
 
   const handleLogout = () => {
     logout()
@@ -144,6 +146,19 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {/* Language selector */}
+      <div className="px-4 pb-2">
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}
+          className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        >
+          {LANGUAGES.map((l) => (
+            <option key={l.code} value={l.code}>{l.label}</option>
+          ))}
+        </select>
+      </div>
 
       {/* User */}
       <div className="border-t border-slate-800 px-4 py-4">

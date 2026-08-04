@@ -5,6 +5,7 @@ import { getTasksByProperty, startTask, completeTask, cancelTask } from '../api/
 import { useAuthStore } from '../store/authStore'
 import { AddTaskModal } from './housekeeping/AddTaskModal'
 import { Pagination } from '../components/Pagination'
+import { TranslateButton } from '../components/TranslateButton'
 
 const STATUS_TABS: { label: string; value: TaskStatus | 'All' }[] = [
   { label: 'All', value: 'All' },
@@ -249,7 +250,7 @@ export function HousekeepingPage() {
                     return (
                       <tr key={t.id} className="border-b border-slate-700/50 hover:bg-slate-700/20 transition-colors">
                         <td className="px-5 py-4">
-                          <p className="text-white font-medium">{t.title}</p>
+                          <TranslateButton text={t.title} className="text-white font-medium" />
                           <p className="text-xs text-slate-500 mt-0.5">Room {t.roomNumber}</p>
                         </td>
                         <td className="px-5 py-4 text-slate-300">{t.assignedToName ?? '—'}</td>
