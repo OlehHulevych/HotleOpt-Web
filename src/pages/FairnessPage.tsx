@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type { StaffFairnessDto } from '../types/fairness'
 import { getStaffFairness } from '../api/fairness'
 
@@ -32,16 +32,14 @@ export function FairnessPage() {
   const avgTasks = staff.length ? Math.round(totalTasks / staff.length) : 0
 
   return (
-    <div className="flex min-h-screen bg-[#0F172A]">
-      <Sidebar />
-
-      <main className="flex-1 p-8 overflow-y-auto">
+    <Layout>
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         <div className="mb-8">
           <h1 className="text-xl font-semibold text-white">{t('fairness.title')}</h1>
           <p className="text-slate-400 text-sm mt-0.5">{t('fairness.subtitle')}</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5">
             <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-1">{t('fairness.totalStaff')}</p>
             <p className="text-3xl font-semibold text-white">{staff.length}</p>
@@ -115,6 +113,6 @@ export function FairnessPage() {
           </div>
         )}
       </main>
-    </div>
+    </Layout>
   )
 }

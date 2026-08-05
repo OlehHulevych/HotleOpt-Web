@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import { useAuthStore } from '../store/authStore'
 import { getRoomsByProperty } from '../api/rooms'
 import { getBookingsByProperty } from '../api/bookings'
@@ -108,10 +108,8 @@ export default function DashboardPage() {
   }))
 
   return (
-    <div className="flex min-h-screen bg-[#0F172A]">
-      <Sidebar />
-
-      <main className="flex-1 p-8 overflow-y-auto">
+    <Layout>
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         <div className="mb-8">
           <h1 className="text-xl font-semibold text-white">Overview</h1>
           <p className="text-slate-400 text-sm mt-0.5">
@@ -188,6 +186,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
-    </div>
+    </Layout>
   )
 }

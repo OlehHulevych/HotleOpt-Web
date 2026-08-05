@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type { TaskTemplateDto, RoomType } from '../types/template'
 import { getTemplatesByProperty } from '../api/templates'
 import { useAuthStore } from '../store/authStore'
@@ -38,11 +38,9 @@ export function TemplatesPage() {
 
   return (
     <>
-      <div className="flex min-h-screen bg-[#0F172A]">
-        <Sidebar />
-
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="flex items-center justify-between mb-8">
+      <Layout>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">{t('templates.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{t('templates.subtitle')}</p>
@@ -110,7 +108,7 @@ export function TemplatesPage() {
             </div>
           )}
         </main>
-      </div>
+      </Layout>
 
       <CreateTemplateModal
         isOpen={showCreate}

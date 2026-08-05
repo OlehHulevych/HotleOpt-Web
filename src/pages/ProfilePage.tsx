@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import { useAuthStore } from '../store/authStore'
 import { uploadAvatar, getMe } from '../api/auth'
 
@@ -35,10 +35,8 @@ export function ProfilePage() {
   const initials = `${user?.firstName?.[0] ?? ''}${user?.secondName?.[0] ?? ''}`
 
   return (
-    <div className="flex min-h-screen bg-[#0F172A]">
-      <Sidebar />
-
-      <main className="flex-1 p-8 overflow-y-auto">
+    <Layout>
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         <div className="mb-8">
           <h1 className="text-xl font-semibold text-white">{t('profile.title')}</h1>
           <p className="text-slate-400 text-sm mt-0.5">{t('profile.manageAccount')}</p>
@@ -118,6 +116,6 @@ export function ProfilePage() {
           </div>
         </div>
       </main>
-    </div>
+    </Layout>
   )
 }

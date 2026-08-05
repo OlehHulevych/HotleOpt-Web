@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type {Guest} from '../types/guest'
 import {getGuests, deleteGuest} from '../api/guests'
 import {useAuthStore} from '../store/authStore'
@@ -45,11 +45,9 @@ export function GuestsPage() {
 
   return (
     <>
-      <div className="flex min-h-screen bg-[#0F172A]">
-        <Sidebar />
-
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="flex items-center justify-between mb-8">
+      <Layout>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">{t('guests.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{guests.length} total</p>
@@ -94,7 +92,8 @@ export function GuestsPage() {
               <p className="text-sm">{t('guests.empty')}</p>
             </div>
           ) : (
-            <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+            <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden min-w-[500px]">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-700">
@@ -143,9 +142,10 @@ export function GuestsPage() {
               </table>
               <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
             </div>
+            </div>
           )}
         </main>
-      </div>
+      </Layout>
 
       <EditGuestModal guest={editGuest} onClose={() => setEditGuest(null)} onSuccess={fetchGuests} />
       <AddGuestModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} onSuccess={fetchGuests} />

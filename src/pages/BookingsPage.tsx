@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type { Booking, BookingFilters, BookingStatus } from '../types/booking'
 import { getBookingsByProperty, checkIn, checkOut, cancelBooking } from '../api/bookings'
 import { useAuthStore } from '../store/authStore'
@@ -73,13 +73,19 @@ export default function BookingsPage() {
       ...filters,
       ...(activeStatus !== 'All' ? { status: activeStatus as BookingStatus } : {}),
     }
-    getBookingsByProperty(propertyId, apiFilters, page)
-      .then((result) => { setBookings(result.items); setTotalPages(result.totalPages) })
-      .finally(() => setLoading(false))
+    setTimeout(()=>{
+      getBookingsByProperty(propertyId, apiFilters, page)
+          .then((result) => { setBookings(result.items); setTotalPages(result.totalPages) })
+          .finally(() => setLoading(false))
+    },1000)
   }, [activeStatus, propertyId, page, filters])
 
-  useEffect(() => { fetchBookings() }, [fetchBookings])
-  useEffect(() => { setPage(1) }, [filters, activeStatus])
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchBookings() }, [fetchBookings])
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPage(1) }, [filters, activeStatus])
 
   const handleCheckIn = async (id: string) => {
     try {
@@ -119,11 +125,9 @@ export default function BookingsPage() {
 
   return (
     <>
-      <div className="flex min-h-screen bg-[#0F172A]">
-        <Sidebar />
-
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="flex items-center justify-between mb-8">
+      <Layout>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">{t('bookings.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{bookings.length} total</p>
@@ -141,7 +145,7 @@ export default function BookingsPage() {
             )}
           </div>
 
-          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-4">
+          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 mb-4 overflow-x-auto">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
@@ -232,7 +236,8 @@ export default function BookingsPage() {
             )}
           </div>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden min-w-[600px]">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
@@ -321,8 +326,9 @@ export default function BookingsPage() {
             </table>
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
+          </div>
         </main>
-      </div>
+      </Layout>
 
       <AddBookingModal
         isOpen={showAddModal}

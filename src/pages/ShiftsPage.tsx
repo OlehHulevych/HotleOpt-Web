@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type { Shift, ShiftStatus } from '../types/shift'
 import { getShiftsByProperty, deleteShift } from '../api/shifts'
 import { useAuthStore } from '../store/authStore'
@@ -84,11 +84,9 @@ export function ShiftsPage() {
 
   return (
     <>
-      <div className="flex min-h-screen bg-[#0F172A]">
-        <Sidebar />
-
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="flex items-center justify-between mb-8">
+      <Layout>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">{t('shifts.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{shifts.length} {t('shifts.title').toLowerCase()}</p>
@@ -106,7 +104,7 @@ export function ShiftsPage() {
             )}
           </div>
 
-          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-6">
+          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 mb-6 overflow-x-auto">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
@@ -120,7 +118,8 @@ export function ShiftsPage() {
             ))}
           </div>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden min-w-[550px]">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
@@ -179,8 +178,9 @@ export function ShiftsPage() {
             </table>
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
+          </div>
         </main>
-      </div>
+      </Layout>
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">

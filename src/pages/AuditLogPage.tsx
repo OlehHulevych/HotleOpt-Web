@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type { AuditLogDto, EntityAction } from '../types/audit'
 import { getAuditLogs } from '../api/audit'
 import { getUsers } from '../api/users'
@@ -66,10 +66,8 @@ export function AuditLogPage() {
   const hasFilters = !!(entityFilter || actionFilter)
 
   return (
-    <div className="flex min-h-screen bg-[#0F172A]">
-      <Sidebar />
-
-      <main className="flex-1 p-8 overflow-y-auto">
+    <Layout>
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-xl font-semibold text-white">{t('audit.title')}</h1>
@@ -122,7 +120,8 @@ export function AuditLogPage() {
           )}
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden min-w-[600px]">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-700">
@@ -175,7 +174,8 @@ export function AuditLogPage() {
             </tbody>
           </table>
         </div>
+        </div>
       </main>
-    </div>
+    </Layout>
   )
 }

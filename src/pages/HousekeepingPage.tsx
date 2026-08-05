@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type { HousekeepingTask, HouseTaskFilters, TaskStatus } from '../types/task'
 import { getTasksByProperty, startTask, completeTask, cancelTask } from '../api/task'
 import { useAuthStore } from '../store/authStore'
@@ -99,11 +99,9 @@ export function HousekeepingPage() {
 
   return (
     <>
-      <div className="flex min-h-screen bg-[#0F172A]">
-        <Sidebar />
-
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="flex items-center justify-between mb-8">
+      <Layout>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">{t('housekeeping.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{tasks.length} {t('housekeeping.task').toLowerCase()}s</p>
@@ -121,7 +119,7 @@ export function HousekeepingPage() {
             )}
           </div>
 
-          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 w-fit mb-4">
+          <div className="flex gap-1 bg-slate-800/50 border border-slate-700 rounded-xl p-1 mb-4 overflow-x-auto">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.value}
@@ -212,7 +210,8 @@ export function HousekeepingPage() {
             )}
           </div>
 
-          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl overflow-hidden min-w-[550px]">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-700">
@@ -293,8 +292,9 @@ export function HousekeepingPage() {
             </table>
             <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </div>
+          </div>
         </main>
-      </div>
+      </Layout>
 
       {isManager && propertyId && (
         <AddTaskModal

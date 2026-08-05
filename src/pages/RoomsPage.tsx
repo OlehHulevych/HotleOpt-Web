@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import type { Room, RoomStatus } from '../types/room'
 import { getRoomsByProperty } from '../api/rooms'
 import { useAuthStore } from '../store/authStore'
@@ -52,11 +52,9 @@ export function RoomsPage() {
 
   return (
     <>
-      <div className="flex min-h-screen bg-[#0F172A]">
-        <Sidebar />
-
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="flex items-center justify-between mb-8">
+      <Layout>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
             <div>
               <h1 className="text-xl font-semibold text-white">{t('rooms.title')}</h1>
               <p className="text-slate-400 text-sm mt-0.5">{rooms.length} total</p>
@@ -130,7 +128,7 @@ export function RoomsPage() {
           )}
           <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
         </main>
-      </div>
+      </Layout>
 
       <RoomDetailModal
         room={selectedRoom}

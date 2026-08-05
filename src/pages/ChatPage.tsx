@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import * as signalR from '@microsoft/signalr'
 import { useTranslation } from 'react-i18next'
-import Sidebar from '../components/Sidebar'
+import { Layout } from '../components/Layout'
 import { useAuthStore } from '../store/authStore'
 import { useLanguageStore } from '../store/languageStore'
 import { getMessages } from '../api/messages'
@@ -90,11 +90,9 @@ export function ChatPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-[#0F172A]">
-      <Sidebar />
-
-      <main className="flex-1 flex flex-col h-screen">
-        <div className="flex items-center justify-between px-8 py-5 border-b border-slate-800 shrink-0">
+    <Layout>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between px-4 sm:px-8 py-5 border-b border-slate-800 shrink-0">
           <div>
             <h1 className="text-xl font-semibold text-white">{t('chat.title')}</h1>
             <p className="text-slate-400 text-sm mt-0.5">{t('chat.subtitle')}</p>
@@ -105,7 +103,7 @@ export function ChatPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-4">
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <svg className="animate-spin w-6 h-6 text-cyan-500" fill="none" viewBox="0 0 24 24">
@@ -161,7 +159,7 @@ export function ChatPage() {
           <div ref={bottomRef} />
         </div>
 
-        <form onSubmit={handleSend} className="px-8 py-5 border-t border-slate-800 shrink-0">
+        <form onSubmit={handleSend} className="px-4 sm:px-8 py-5 border-t border-slate-800 shrink-0">
           <div className="flex gap-3">
             <input
               value={input}
@@ -182,6 +180,6 @@ export function ChatPage() {
           </div>
         </form>
       </main>
-    </div>
+    </Layout>
   )
 }
