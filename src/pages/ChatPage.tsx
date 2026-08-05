@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import * as signalR from '@microsoft/signalr'
+import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import { useAuthStore } from '../store/authStore'
 import { getMessages } from '../api/messages'
 import type { Message } from '../types/message'
 
 export function ChatPage() {
+  const { t } = useTranslation()
   const user = useAuthStore((s) => s.user)
   const token = useAuthStore((s) => s.token)
   const propertyId = user?.propertyId
@@ -75,12 +77,12 @@ export function ChatPage() {
       <main className="flex-1 flex flex-col h-screen">
         <div className="flex items-center justify-between px-8 py-5 border-b border-slate-800 shrink-0">
           <div>
-            <h1 className="text-xl font-semibold text-white">Team Chat</h1>
-            <p className="text-slate-400 text-sm mt-0.5">Property staff channel</p>
+            <h1 className="text-xl font-semibold text-white">{t('chat.title')}</h1>
+            <p className="text-slate-400 text-sm mt-0.5">{t('chat.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2">
             <span className={`w-2 h-2 rounded-full ${connected ? 'bg-cyan-400' : 'bg-slate-500'}`} />
-            <span className="text-xs text-slate-400">{connected ? 'Connected' : 'Connecting...'}</span>
+            <span className="text-xs text-slate-400">{connected ? t('chat.connected') : t('chat.connecting')}</span>
           </div>
         </div>
 
@@ -94,7 +96,7 @@ export function ChatPage() {
             </div>
           ) : messages.length === 0 ? (
             <div className="flex items-center justify-center h-full text-slate-500 text-sm">
-              No messages yet. Say hello!
+              {t('chat.empty')}
             </div>
           ) : (
             messages.map((m) => {
@@ -106,7 +108,7 @@ export function ChatPage() {
                   </div>
                   <div className={`max-w-xs lg:max-w-md ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
                     <span className={`text-xs text-slate-500 ${isMe ? 'text-right' : ''}`}>
-                      {isMe ? 'You' : m.senderName} · {fmt(m.createdAt)}
+                      {isMe ? t('chat.you') : m.senderName} · {fmt(m.createdAt)}
                     </span>
                     <div className={`px-4 py-2.5 rounded-2xl text-sm ${
                       isMe
@@ -128,7 +130,7 @@ export function ChatPage() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Type a message..."
+              placeholder={t('chat.typeMessage')}
               disabled={!connected}
               className="flex-1 px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50"
             />

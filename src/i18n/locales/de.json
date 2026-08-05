@@ -177,6 +177,15 @@
     "assignTo": "Zuweisen an",
     "empty": "Keine Vorlagen vorhanden."
   },
+  "chat": {
+    "title": "Team-Chat",
+    "subtitle": "Mitarbeiterkanal",
+    "connected": "Verbunden",
+    "connecting": "Verbinde...",
+    "empty": "Noch keine Nachrichten. Sagen Sie Hallo!",
+    "you": "Sie",
+    "typeMessage": "Nachricht eingeben..."
+  },
   "profile": {
     "title": "Profil",
     "uploadAvatar": "Bild hochladen",

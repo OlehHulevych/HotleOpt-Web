@@ -177,6 +177,15 @@
     "assignTo": "Przypisz do",
     "empty": "Brak szablonów."
   },
+  "chat": {
+    "title": "Czat zespołu",
+    "subtitle": "Kanał personelu hotelu",
+    "connected": "Połączono",
+    "connecting": "Łączenie...",
+    "empty": "Brak wiadomości. Napisz coś!",
+    "you": "Ty",
+    "typeMessage": "Wpisz wiadomość..."
+  },
   "profile": {
     "title": "Profil",
     "uploadAvatar": "Prześlij zdjęcie",

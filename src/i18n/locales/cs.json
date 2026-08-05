@@ -68,7 +68,7 @@
     "createTask": "Vytvořit úkol",
     "task": "Úkol",
     "assignedTo": "Přiřazeno",
-    "scheduled": "Naplánováno",
+    "scheduled": "Naplánováno",ok 
     "start": "Zahájit",
     "complete": "Dokončit",
     "empty": "Žádné úkoly nenalezeny"
@@ -176,6 +176,15 @@
     "applying": "Aplikování...",
     "assignTo": "Přiřadit",
     "empty": "Zatím žádné šablony."
+  },
+  "chat": {
+    "title": "Týmový chat",
+    "subtitle": "Kanál personálu hotelu",
+    "connected": "Připojeno",
+    "connecting": "Připojování...",
+    "empty": "Zatím žádné zprávy. Pozdravte se!",
+    "you": "Vy",
+    "typeMessage": "Napište zprávu..."
   },
   "profile": {
     "title": "Profil",

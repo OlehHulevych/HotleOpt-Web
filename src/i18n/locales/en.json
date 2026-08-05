@@ -177,6 +177,15 @@
     "assignTo": "Assign to",
     "empty": "No templates yet."
   },
+  "chat": {
+    "title": "Team Chat",
+    "subtitle": "Property staff channel",
+    "connected": "Connected",
+    "connecting": "Connecting...",
+    "empty": "No messages yet. Say hello!",
+    "you": "You",
+    "typeMessage": "Type a message..."
+  },
   "profile": {
     "title": "Profile",
     "uploadAvatar": "Upload Avatar",

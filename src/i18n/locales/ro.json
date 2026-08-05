@@ -177,6 +177,15 @@
     "assignTo": "Atribuiți la",
     "empty": "Nu există șabloane încă."
   },
+  "chat": {
+    "title": "Chat echipă",
+    "subtitle": "Canalul personalului hotelului",
+    "connected": "Conectat",
+    "connecting": "Se conectează...",
+    "empty": "Niciun mesaj încă. Spuneți salut!",
+    "you": "Tu",
+    "typeMessage": "Scrieți un mesaj..."
+  },
   "profile": {
     "title": "Profil",
     "uploadAvatar": "Încărcați avatar",
