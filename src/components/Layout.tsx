@@ -9,7 +9,7 @@ export function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-[#0F172A]">
+    <div className="flex h-screen bg-[#0F172A]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
