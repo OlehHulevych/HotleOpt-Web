@@ -184,7 +184,9 @@
     "connecting": "Se conectează...",
     "empty": "Niciun mesaj încă. Spuneți salut!",
     "you": "Tu",
-    "typeMessage": "Scrieți un mesaj..."
+    "typeMessage": "Scrieți un mesaj...",
+    "translate": "Traduceți",
+    "showOriginal": "Afișați originalul"
   },
   "profile": {
     "title": "Profil",

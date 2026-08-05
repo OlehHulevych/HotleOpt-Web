@@ -3,7 +3,9 @@ import * as signalR from '@microsoft/signalr'
 import { useTranslation } from 'react-i18next'
 import Sidebar from '../components/Sidebar'
 import { useAuthStore } from '../store/authStore'
+import { useLanguageStore } from '../store/languageStore'
 import { getMessages } from '../api/messages'
+import { translateText } from '../api/translate'
 import type { Message } from '../types/message'
 
 export function ChatPage() {
@@ -12,10 +14,13 @@ export function ChatPage() {
   const token = useAuthStore((s) => s.token)
   const propertyId = user?.propertyId
 
+  const language = useLanguageStore((s) => s.language)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [connected, setConnected] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [translations, setTranslations] = useState<Record<string, string>>({})
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const connectionRef = useRef<signalR.HubConnection | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -58,6 +63,20 @@ export function ChatPage() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  const handleTranslate = async (msgId: string, content: string) => {
+    if (translations[msgId] !== undefined) {
+      setTranslations((prev) => { const next = { ...prev }; delete next[msgId]; return next })
+      return
+    }
+    setTranslating((prev) => ({ ...prev, [msgId]: true }))
+    try {
+      const translated = await translateText(content, language)
+      setTranslations((prev) => ({ ...prev, [msgId]: translated }))
+    } finally {
+      setTranslating((prev) => ({ ...prev, [msgId]: false }))
+    }
+  }
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -115,8 +134,25 @@ export function ChatPage() {
                         ? 'bg-cyan-500 text-white rounded-tr-sm'
                         : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-sm'
                     }`}>
-                      {m.content}
+                      {translations[m.id] ?? m.content}
                     </div>
+                    <button
+                      onClick={() => handleTranslate(m.id, m.content)}
+                      disabled={translating[m.id]}
+                      className={`flex items-center gap-1 text-xs text-slate-500 hover:text-cyan-400 transition-colors disabled:opacity-50 ${isMe ? 'self-end' : ''}`}
+                    >
+                      {translating[m.id] ? (
+                        <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                        </svg>
+                      )}
+                      {translations[m.id] !== undefined ? t('chat.showOriginal') : t('chat.translate')}
+                    </button>
                   </div>
                 </div>
               )

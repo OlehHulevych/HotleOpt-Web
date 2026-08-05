@@ -184,7 +184,9 @@
     "connecting": "Verbinde...",
     "empty": "Noch keine Nachrichten. Sagen Sie Hallo!",
     "you": "Sie",
-    "typeMessage": "Nachricht eingeben..."
+    "typeMessage": "Nachricht eingeben...",
+    "translate": "Übersetzen",
+    "showOriginal": "Original anzeigen"
   },
   "profile": {
     "title": "Profil",

@@ -184,7 +184,9 @@
     "connecting": "Connecting...",
     "empty": "No messages yet. Say hello!",
     "you": "You",
-    "typeMessage": "Type a message..."
+    "typeMessage": "Type a message...",
+    "translate": "Translate",
+    "showOriginal": "Show original"
   },
   "profile": {
     "title": "Profile",

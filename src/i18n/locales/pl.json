@@ -184,7 +184,9 @@
     "connecting": "Łączenie...",
     "empty": "Brak wiadomości. Napisz coś!",
     "you": "Ty",
-    "typeMessage": "Wpisz wiadomość..."
+    "typeMessage": "Wpisz wiadomość...",
+    "translate": "Przetłumacz",
+    "showOriginal": "Pokaż oryginał"
   },
   "profile": {
     "title": "Profil",

@@ -68,7 +68,7 @@
     "createTask": "Vytvořit úkol",
     "task": "Úkol",
     "assignedTo": "Přiřazeno",
-    "scheduled": "Naplánováno",ok 
+    "scheduled": "Naplánováno",
     "start": "Zahájit",
     "complete": "Dokončit",
     "empty": "Žádné úkoly nenalezeny"
@@ -184,7 +184,9 @@
     "connecting": "Připojování...",
     "empty": "Zatím žádné zprávy. Pozdravte se!",
     "you": "Vy",
-    "typeMessage": "Napište zprávu..."
+    "typeMessage": "Napište zprávu...",
+    "translate": "Přeložit",
+    "showOriginal": "Zobrazit originál"
   },
   "profile": {
     "title": "Profil",
