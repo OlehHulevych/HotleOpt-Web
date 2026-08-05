@@ -177,6 +177,16 @@
     "assignTo": "Przypisz do",
     "empty": "Brak szablonów."
   },
+  "inspections": {
+    "title": "Inspekcja AI pokoju",
+    "inspect": "Inspekcja AI",
+    "runInspection": "Prześlij zdjęcie do inspekcji",
+    "inspecting": "Trwa inspekcja...",
+    "passed": "Zaliczona",
+    "failed": "Niezaliczona",
+    "history": "Historia inspekcji",
+    "noHistory": "Brak inspekcji"
+  },
   "chat": {
     "title": "Czat zespołu",
     "subtitle": "Kanał personelu hotelu",

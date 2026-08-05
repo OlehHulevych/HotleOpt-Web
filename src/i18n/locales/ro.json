@@ -177,6 +177,16 @@
     "assignTo": "Atribuiți la",
     "empty": "Nu există șabloane încă."
   },
+  "inspections": {
+    "title": "Inspecție AI cameră",
+    "inspect": "Inspecție AI",
+    "runInspection": "Încărcați foto pentru inspecție",
+    "inspecting": "Se inspectează...",
+    "passed": "Trecut",
+    "failed": "Nepromovat",
+    "history": "Istoricul inspecțiilor",
+    "noHistory": "Nicio inspecție încă"
+  },
   "chat": {
     "title": "Chat echipă",
     "subtitle": "Canalul personalului hotelului",

@@ -177,6 +177,16 @@
     "assignTo": "Přiřadit",
     "empty": "Zatím žádné šablony."
   },
+  "inspections": {
+    "title": "AI inspekce pokoje",
+    "inspect": "AI inspekce",
+    "runInspection": "Nahrát foto pro inspekci",
+    "inspecting": "Probíhá inspekce...",
+    "passed": "Prošel",
+    "failed": "Neprošel",
+    "history": "Historie inspekcí",
+    "noHistory": "Žádné inspekce"
+  },
   "chat": {
     "title": "Týmový chat",
     "subtitle": "Kanál personálu hotelu",

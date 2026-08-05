@@ -7,9 +7,10 @@ import { STATUS_STYLE, TYPE_STYLE } from './constants'
 interface RoomDetailModalProps {
   room: Room | null
   onClose: () => void
+  onInspect: () => void
 }
 
-export function RoomDetailModal({ room, onClose }: RoomDetailModalProps) {
+export function RoomDetailModal({ room, onClose, onInspect }: RoomDetailModalProps) {
   const { t } = useTranslation()
   const [photos, setPhotos] = useState<RoomPhoto[]>([])
 
@@ -96,6 +97,16 @@ export function RoomDetailModal({ room, onClose }: RoomDetailModalProps) {
         >
           {t('rooms.uploadPhotos')}
         </label>
+
+        <button
+          onClick={onInspect}
+          className="w-full py-2.5 mb-2 flex items-center justify-center gap-2 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-700 text-cyan-400 text-sm font-medium rounded-xl transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
+          </svg>
+          {t('inspections.inspect')}
+        </button>
 
         <button onClick={onClose} className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-colors">
           {t('common.close')}

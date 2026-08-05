@@ -177,6 +177,16 @@
     "assignTo": "Zuweisen an",
     "empty": "Keine Vorlagen vorhanden."
   },
+  "inspections": {
+    "title": "KI-Zimmerinspektion",
+    "inspect": "KI-Inspektion",
+    "runInspection": "Foto für Inspektion hochladen",
+    "inspecting": "Inspektion läuft...",
+    "passed": "Bestanden",
+    "failed": "Nicht bestanden",
+    "history": "Inspektionsverlauf",
+    "noHistory": "Noch keine Inspektionen"
+  },
   "chat": {
     "title": "Team-Chat",
     "subtitle": "Mitarbeiterkanal",

@@ -177,6 +177,16 @@
     "assignTo": "Assign to",
     "empty": "No templates yet."
   },
+  "inspections": {
+    "title": "AI Room Inspection",
+    "inspect": "AI Inspect",
+    "runInspection": "Upload Photo to Inspect",
+    "inspecting": "Inspecting...",
+    "passed": "Passed",
+    "failed": "Failed",
+    "history": "Inspection History",
+    "noHistory": "No inspections yet"
+  },
   "chat": {
     "title": "Team Chat",
     "subtitle": "Property staff channel",

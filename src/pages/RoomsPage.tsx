@@ -9,6 +9,7 @@ import { RoomCard } from './rooms/RoomCard'
 import { RoomDetailModal } from './rooms/RoomDetailModal'
 import { AddRoomModal } from './rooms/AddRoomModal'
 import { EditRoomModal } from './rooms/EditRoomModal'
+import { InspectionModal } from './rooms/InspectionModal'
 import {Pagination} from "../components/Pagination.tsx";
 
 export function RoomsPage() {
@@ -16,6 +17,7 @@ export function RoomsPage() {
   const [rooms, setRooms] = useState<Room[]>([])
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [editRoom, setEditRoom] = useState<Room | null>(null)
+  const [inspectRoom, setInspectRoom] = useState<Room | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [activeStatus, setActiveStatus] = useState<RoomStatus | 'All'>('All')
@@ -130,7 +132,12 @@ export function RoomsPage() {
         </main>
       </div>
 
-      <RoomDetailModal room={selectedRoom} onClose={() => setSelectedRoom(null)} />
+      <RoomDetailModal
+        room={selectedRoom}
+        onClose={() => setSelectedRoom(null)}
+        onInspect={() => { setInspectRoom(selectedRoom); setSelectedRoom(null) }}
+      />
+      <InspectionModal room={inspectRoom} onClose={() => setInspectRoom(null)} />
       <EditRoomModal room={editRoom} onClose={() => setEditRoom(null)} onSuccess={fetchRooms} />
       {isManager && user?.propertyId && (
         <AddRoomModal
