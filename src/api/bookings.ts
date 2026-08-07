@@ -1,5 +1,5 @@
 import client from './client'
-import type { Booking, BookingFilters } from '../types/booking'
+import type {Booking, BookingFilters} from '../types/booking'
 import type { PaginatedResult } from '../types/room'
 
 export const getBookingsByProperty = (propertyId: string, filters?: BookingFilters, page = 1, pageSize = 20) =>

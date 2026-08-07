@@ -6,4 +6,5 @@ export interface UserDto {
   role: string
   tenantId: string
   propertyId?: string
+  isBanned: boolean
 }

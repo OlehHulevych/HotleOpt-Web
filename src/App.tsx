@@ -17,7 +17,8 @@ import {ChatPage} from "./pages/ChatPage.tsx";
 import {FairnessPage} from "./pages/FairnessPage.tsx";
 import {AuditLogPage} from "./pages/AuditLogPage.tsx";
 import {TemplatesPage} from "./pages/TemplatesPage.tsx";
-import {StaffPage} from "./pages/StaffPage.tsx";
+import StaffPage from "./pages/StaffPage.tsx";
+import BillingPage from "./pages/BillingPage.tsx";
 import {Toaster} from "sonner";
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
         <Route path={"audit"} element={<AuditLogPage/>}/>
         <Route path={"templates"} element={<TemplatesPage/>}/>
         <Route path={"staff"} element={<StaffPage/>}/>
+        <Route path={"billing"} element={<BillingPage/>}/>
       </Routes>
 
     </BrowserRouter>

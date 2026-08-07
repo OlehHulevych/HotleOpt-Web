@@ -6,6 +6,19 @@ export const login = (data: LoginRequest) =>
 
 export const getMe = () => client.get<User>('/api/auth/me').then((r) => r.data)
 
+export interface RegisterStaffRequest {
+  name: string
+  surname: string
+  email: string
+  password: string
+  role: string
+  tenantId: string
+  propertyId: string
+}
+
+export const registerStaff = (data: RegisterStaffRequest) =>
+  client.post('/api/auth/register', data)
+
 export const uploadAvatar = (file: File) => {
   const form = new FormData()
   form.append('file', file)

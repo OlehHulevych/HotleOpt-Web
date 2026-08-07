@@ -9,3 +9,6 @@ export const updateRole = (id: string, role: string) =>
 
 export const banUser = (id: string) =>
   client.delete(`/api/users/${id}`)
+
+export const unbanUser = (id: string) =>
+  client.patch(`/api/users/${id}/unban`)

@@ -3,9 +3,9 @@ import { Layout } from '../components/Layout'
 import { useAuthStore } from '../store/authStore'
 import { getRoomsByProperty } from '../api/rooms'
 import { getBookingsByProperty } from '../api/bookings'
+import type { BookingStatus } from '../types/booking'
 import { getTasksByProperty } from '../api/task'
 import { getTicketsByProperty } from '../api/tickets'
-import type { RoomStatus } from '../types/room'
 
 interface Stats {
   availableRooms: number
@@ -43,7 +43,7 @@ export default function DashboardPage() {
 
     Promise.all([
       getRoomsByProperty(propertyId, undefined, 1, 100),
-      getBookingsByProperty(propertyId, { Status: 'CheckedIn' }, 1, 1),
+      getBookingsByProperty(propertyId, { status: 'CheckedIn' as BookingStatus }, 1, 1),
       getTasksByProperty(propertyId, {Status: 'Pending'}, 1, 1),
       getTicketsByProperty(propertyId, { Status: 'Open' }, 1, 1),
     ]).then(([rooms, bookings, tasks, tickets]) => {
