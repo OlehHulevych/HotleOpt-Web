@@ -7,6 +7,7 @@ import { exportBookings } from '../api/export'
 import { useAuthStore } from '../store/authStore'
 import { AddBookingModal } from './bookings/AddBookingModal.tsx'
 import { InvoiceModal } from './bookings/InvoiceModal.tsx'
+import { AddGuestToBookingModal } from './bookings/AddGuestToBookingModal.tsx'
 import { Pagination } from '../components/Pagination'
 import { toast } from 'sonner'
 
@@ -64,6 +65,7 @@ export default function BookingsPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [filters, setFilters] = useState<BookingFilters>(EMPTY_FILTERS)
   const [invoiceBookingId, setInvoiceBookingId] = useState<string | null>(null)
+  const [addGuestBookingId, setAddGuestBookingId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
 
   const handleExport = async () => {
@@ -329,13 +331,21 @@ export default function BookingsPage() {
                             </button>
                           )}
                           {isManager && (b.status === 'Confirmed' || b.status === 'CheckedIn') && (
-                            <button
-                              onClick={() => handleCancel(b.id)}
-                              disabled={actionLoading === b.id}
-                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50"
-                            >
-                              {t('common.cancel')}
-                            </button>
+                            <>
+                              <button
+                                onClick={() => setAddGuestBookingId(b.id)}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-500/10 text-slate-400 hover:bg-slate-500/20 transition-colors"
+                              >
+                                + Guest
+                              </button>
+                              <button
+                                onClick={() => handleCancel(b.id)}
+                                disabled={actionLoading === b.id}
+                                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-50"
+                              >
+                                {t('common.cancel')}
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -361,6 +371,12 @@ export default function BookingsPage() {
         bookingId={invoiceBookingId ?? ''}
         isOpen={invoiceBookingId !== null}
         onClose={() => setInvoiceBookingId(null)}
+      />
+
+      <AddGuestToBookingModal
+        bookingId={addGuestBookingId}
+        onClose={() => setAddGuestBookingId(null)}
+        onSuccess={fetchBookings}
       />
     </>
   )
